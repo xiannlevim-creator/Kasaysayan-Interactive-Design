@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#493722">
+  <title>HistoryRunnn | America Phase 1</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: #493722;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .background {
+      position: fixed;
+      z-index: -1;
+      inset: 0;
+    }
+
+    .background img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .background::after {
+      position: absolute;
+      inset: 0;
+      background: rgb(36 27 17 / 52%);
+      content: "";
+    }
+
+    main {
+      display: grid;
+      min-height: 100vh;
+      min-height: 100svh;
+      place-items: center;
+      padding: clamp(16px, 4vw, 36px);
+    }
+
+    .phase-board {
+      width: min(100%, 900px);
+      padding: clamp(22px, 5vw, 52px);
+      background:
+        radial-gradient(ellipse at 12% 18%, rgb(128 86 43 / 12%), transparent 26%),
+        repeating-linear-gradient(1deg, rgb(121 82 40 / 4%) 0 1px, transparent 1px 6px),
+        linear-gradient(135deg, #f7e8c7, #dbbd85);
+      border: clamp(8px, 1.5vw, 16px) ridge #805b32;
+      border-radius: 12px;
+      box-shadow: 0 18px 60px rgb(25 18 10 / 55%), inset 0 0 0 3px rgb(255 246 221 / 55%);
+    }
+
+    .phase-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 16px;
+      padding: 8px 13px;
+      color: #fff3d4;
+      background: linear-gradient(135deg, #365775, #1d3448);
+      border: 2px solid #dfb873;
+      border-radius: 999px;
+      box-shadow: 0 3px 8px rgb(20 10 14 / 30%);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .phase-kicker svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    h1 {
+      margin: 0;
+      color: #5f4225;
+      font-size: clamp(1.9rem, 5.5vw, 3.2rem);
+      font-variant: small-caps;
+      line-height: 1.12;
+      text-shadow: 0 1px 0 rgb(255 248 230 / 70%);
+    }
+
+    .phase-intro {
+      max-width: 760px;
+      margin: 18px 0 22px;
+      font-size: 1.05rem;
+      line-height: 1.65;
+    }
+
+    .naval-scene {
+      position: relative;
+      height: 112px;
+      margin: 0 0 26px;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse at 80% 18%, rgb(255 239 196 / 65%) 0 6%, transparent 6.5%),
+        linear-gradient(180deg, #9cb8bc 0 44%, #42687a 45% 72%, #254758 73%);
+      border: 2px solid #805b32;
+      border-radius: 8px;
+      box-shadow: inset 0 0 0 3px rgb(255 248 230 / 35%);
+    }
+
+    .naval-scene::before {
+      position: absolute;
+      right: -2%;
+      bottom: 28px;
+      left: -2%;
+      height: 19px;
+      background:
+        radial-gradient(ellipse at 18% 100%, #566b55 0 28%, transparent 30%),
+        radial-gradient(ellipse at 32% 100%, #667556 0 36%, transparent 38%),
+        radial-gradient(ellipse at 90% 100%, #667556 0 35%, transparent 37%);
+      content: "";
+    }
+
+    .naval-scene::after {
+      position: absolute;
+      right: 0;
+      bottom: 18px;
+      left: 0;
+      border-top: 2px dashed rgb(221 231 222 / 48%);
+      content: "";
+    }
+
+    .warship {
+      position: absolute;
+      top: 37px;
+      left: -100px;
+      width: 84px;
+      height: 54px;
+      color: #2e3434;
+      filter: drop-shadow(0 2px 2px rgb(15 24 29 / 40%));
+      animation: fleet-arrival 12s linear infinite;
+    }
+
+    .warship--second {
+      top: 50px;
+      width: 64px;
+      height: 42px;
+      opacity: 0.82;
+      animation-delay: -6s;
+      animation-duration: 14s;
+    }
+
+    @keyframes fleet-arrival {
+      to {
+        left: calc(100% + 100px);
+      }
+    }
+
+    .events-title {
+      margin: 0 0 12px;
+      color: #674723;
+      font-size: 1.15rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .event-list {
+      display: grid;
+      gap: 12px;
+      margin: 0 0 26px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .event-item {
+      display: grid;
+      grid-template-columns: minmax(110px, 150px) minmax(0, 1fr);
+      column-gap: 16px;
+      padding: 15px 18px;
+      background: rgb(255 249 228 / 68%);
+      border-left: 4px solid #805b32;
+      box-shadow: inset 0 0 0 1px rgb(122 83 40 / 16%);
+    }
+
+    .event-date {
+      grid-row: span 2;
+      align-self: center;
+      color: #76552f;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      line-height: 1.4;
+      text-transform: uppercase;
+    }
+
+    .event-item h2 {
+      margin: 0 0 5px;
+      color: #674723;
+      font-size: 1.05rem;
+    }
+
+    .event-item p {
+      margin: 0;
+      font-size: 0.98rem;
+      line-height: 1.55;
+    }
+
+    .return-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 12px 20px;
+      color: #fff3d4;
+      background: linear-gradient(180deg, #805a2e, #55391d);
+      border: 1px solid #cba66a;
+      border-radius: 6px;
+      box-shadow: 0 4px 10px rgb(37 25 12 / 25%);
+      font-weight: 600;
+      text-decoration: none;
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .return-link:hover {
+      box-shadow: 0 7px 14px rgb(37 25 12 / 35%);
+      transform: translateY(-2px);
+    }
+
+    .return-link:focus-visible {
+      outline: 2px solid #f0cd88;
+      outline-offset: 3px;
+    }
+
+    .phase-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .complete-phase {
+      padding: 12px 20px;
+      color: #493722;
+      background: #f3dfb2;
+      border: 1px solid #a17a4a;
+      border-radius: 6px;
+      font: 600 1rem Georgia, "Times New Roman", serif;
+      cursor: pointer;
+    }
+
+    .complete-phase:disabled {
+      color: #fff3d4;
+      background: #557044;
+      border-color: #78905c;
+      cursor: default;
+    }
+
+    .phase-status {
+      flex-basis: 100%;
+      margin: 0;
+      color: #674723;
+      font-weight: 700;
+    }
+
+    .complete-phase:focus-visible {
+      outline: 2px solid #f0cd88;
+      outline-offset: 3px;
+    }
+
+    @media (max-width: 560px) {
+      .event-item {
+        grid-template-columns: 1fr;
+        row-gap: 4px;
+      }
+
+      .event-date {
+        grid-row: auto;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .warship,
+      .warship--second {
+        left: 28%;
+        animation: none;
+      }
+
+      .warship--second {
+        left: 62%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="background">
+    <img src="us backround.jpg" alt="">
+  </div>
+  <main>
+    <article class="phase-board">
+      <header>
+        <div class="phase-kicker">
+          <svg viewBox="0 0 40 40" aria-hidden="true">
+            <path d="m20 3 5 11 12 1-9 8 3 12-11-6-11 6 3-12-9-8 12-1z" fill="#f1d176" stroke="#fff0a7" stroke-width="2"></path>
+          </svg>
+          <span>America Quest · Phase 1</span>
+        </div>
+        <h1>Quest: The Stars and Stripes Arrive <span>(1898)</span></h1>
+      </header>
+      <p class="phase-intro">
+        At the height of the Spanish-American War, the United States intervenes in the Philippine Revolution, bringing an end to over three centuries of Spanish rule and sparking a new struggle for sovereignty.
+      </p>
+      <div class="naval-scene" role="img" aria-label="American warships cross Manila Bay.">
+        <svg class="warship" viewBox="0 0 100 60" aria-hidden="true">
+          <path d="M8 36h84L79 49H22z" fill="currentColor"></path>
+          <path d="M25 34h48l-4-10H39l-5-7H27z" fill="#d6d1bc"></path>
+          <path d="M43 17h8V9h-8zm18 7h8v-6h-8z" fill="#b9b49f"></path>
+          <path d="M31 31h11v-6H31zm17 0h12v-6H48z" fill="#58707a"></path>
+          <path d="M10 55c8-5 16 5 24 0s16 5 24 0 16 5 24 0" fill="none" stroke="#c3d6d7" stroke-linecap="round" stroke-width="2"></path>
+        </svg>
+        <svg class="warship warship--second" viewBox="0 0 100 60" aria-hidden="true">
+          <path d="M8 36h84L79 49H22z" fill="currentColor"></path>
+          <path d="M25 34h48l-4-10H39l-5-7H27z" fill="#d6d1bc"></path>
+          <path d="M43 17h8V9h-8zm18 7h8v-6h-8z" fill="#b9b49f"></path>
+          <path d="M31 31h11v-6H31zm17 0h12v-6H48z" fill="#58707a"></path>
+          <path d="M10 55c8-5 16 5 24 0s16 5 24 0 16 5 24 0" fill="none" stroke="#c3d6d7" stroke-linecap="round" stroke-width="2"></path>
+        </svg>
+      </div>
+      <h2 class="events-title">Key Events</h2>
+      <ol class="event-list">
+        <li class="event-item">
+          <span class="event-date">May 1, 1898</span>
+          <h2>Battle of Manila Bay</h2>
+          <p>Led by Commodore George Dewey, the U.S. Asiatic Squadron steams into Manila Bay and destroys the Spanish Pacific fleet in a matter of hours.</p>
+        </li>
+        <li class="event-item">
+          <span class="event-date">June–July 1898</span>
+          <h2>The Ground Surge</h2>
+          <p>U.S. expeditionary forces begin landing in Cavite and Parañaque throughout June and July, forming a tense, temporary alliance with Emilio Aguinaldo's revolutionary army.</p>
+        </li>
+        <li class="event-item">
+          <span class="event-date">August 13, 1898</span>
+          <h2>The Mock Battle of Manila</h2>
+          <p>Following a secret agreement, Spanish forces surrender the walled city of Intramuros to American troops after a staged skirmish, deliberately locking Filipino fighters out.</p>
+        </li>
+        <li class="event-item">
+          <span class="event-date">December 10, 1898</span>
+          <h2>The Treaty of Paris</h2>
+          <p>Spain officially cedes the archipelago to the United States for $20 million, setting the stage for the Philippine-American War.</p>
+        </li>
+      </ol>
+      <div class="phase-actions">
+        <button class="complete-phase" type="button">Mark Phase Complete</button>
+        <a class="return-link" href="america.html">
+          <span aria-hidden="true">←</span>
+          <span>Return to America Map</span>
+        </a>
+        <p class="phase-status" aria-live="polite"></p>
+      </div>
+    </article>
+  </main>
+  <script>
+    const phaseId = "1";
+    const phaseKey = `historyrunnn.america.phase.${phaseId}`;
+    const phaseButton = document.querySelector(".complete-phase");
+    const phaseStatus = document.querySelector(".phase-status");
+
+    const showCompletion = () => {
+      phaseButton.disabled = true;
+      phaseButton.textContent = "Phase Complete!";
+      phaseStatus.textContent = "Phase 1 complete — Phase 2 is now unlocked on the America map.";
+    };
+
+    if (localStorage.getItem(phaseKey) === "finished") {
+      showCompletion();
+    }
+
+    phaseButton.addEventListener("click", () => {
+      localStorage.setItem(phaseKey, "finished");
+      const allPhasesComplete = ["1", "2", "3"].every((id) =>
+        localStorage.getItem(`historyrunnn.america.phase.${id}`) === "finished"
+      );
+      if (allPhasesComplete) {
+        localStorage.setItem("historyrunnn.quest.america", "finished");
+      } else {
+        localStorage.removeItem("historyrunnn.quest.america");
+      }
+      showCompletion();
+    });
+  </script>
+  <script src="site-audio.js" defer></script>
+</body>
+</html>

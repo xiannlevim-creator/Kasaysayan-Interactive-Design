@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Japan</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+    }
+
+    .background {
+      position: fixed;
+      z-index: -1;
+      inset: 0;
+    }
+
+    .background img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    main {
+      display: grid;
+      min-height: 100vh;
+      min-height: 100svh;
+      place-items: center;
+      padding: 24px 0;
+    }
+
+    .route-map {
+      position: relative;
+      isolation: isolate;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      width: min(1100px, 94vw);
+      height: 320px;
+      align-items: center;
+      justify-items: center;
+      background:
+        radial-gradient(ellipse 42px 18px at 18% 72%, #788458 0 43%, #c4a06a 46% 57%, transparent 61%),
+        radial-gradient(ellipse 32px 15px at 54% 19%, #788458 0 43%, #c4a06a 46% 57%, transparent 61%),
+        radial-gradient(ellipse 38px 17px at 82% 84%, #788458 0 43%, #c4a06a 46% 57%, transparent 61%),
+        repeating-radial-gradient(ellipse at 28% 42%, transparent 0 23px, rgb(94 119 89 / 10%) 24px 25px, transparent 26px 48px),
+        radial-gradient(ellipse at 77% 72%, rgb(108 158 165 / 22%) 0 15%, transparent 16%),
+        radial-gradient(ellipse at 20% 28%, rgb(125 151 115 / 20%) 0 12%, transparent 13%),
+        repeating-linear-gradient(3deg, rgb(103 70 35 / 5%) 0 1px, transparent 1px 6px),
+        linear-gradient(135deg, #f1e2bb, #c9ab72);
+      border: 10px ridge #76502f;
+      border-radius: 14px;
+      box-shadow: 0 16px 38px rgb(22 16 8 / 48%), inset 0 0 0 3px rgb(255 246 221 / 55%), inset 0 0 28px rgb(91 59 28 / 20%);
+    }
+
+    .route-map::before {
+      position: absolute;
+      z-index: 0;
+      inset: 8px;
+      background:
+        radial-gradient(circle at 0 0, #9b713f 0 3px, #f4dfb6 4px 5px, transparent 6px),
+        radial-gradient(circle at 100% 0, #9b713f 0 3px, #f4dfb6 4px 5px, transparent 6px),
+        radial-gradient(circle at 0 100%, #9b713f 0 3px, #f4dfb6 4px 5px, transparent 6px),
+        radial-gradient(circle at 100% 100%, #9b713f 0 3px, #f4dfb6 4px 5px, transparent 6px);
+      border: 1px solid rgb(112 75 38 / 50%);
+      content: "";
+      pointer-events: none;
+    }
+
+    .map-beast {
+      position: absolute;
+      z-index: 0;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.8;
+      pointer-events: none;
+      animation: beast-drift 6s ease-in-out infinite;
+    }
+
+    .route-map::after {
+      position: absolute;
+      top: 16px;
+      right: 24px;
+      z-index: 2;
+      color: #76502f;
+      content: "N  ↑";
+      font: 700 0.7rem Georgia, "Times New Roman", serif;
+      letter-spacing: 0.12em;
+      pointer-events: none;
+    }
+
+    .route-connectors {
+      position: absolute;
+      z-index: 0;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .route-connectors path {
+      fill: none;
+      stroke: #80552f;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 8;
+      stroke-dasharray: 1 18;
+      filter: drop-shadow(0 1px 2px rgb(44 27 12 / 65%));
+      animation: route-travel 3s linear infinite;
+    }
+
+    .route-connectors .mobile-path {
+      display: none;
+    }
+
+    .route-steps {
+      display: contents;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .map-content {
+      display: grid;
+      justify-items: center;
+      gap: 14px;
+      width: 100%;
+    }
+
+    .route-step-link {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-rows: inherit;
+      gap: inherit;
+      width: 100%;
+      height: 100%;
+      place-items: center;
+      padding: inherit;
+      color: inherit;
+      border-radius: inherit;
+      font: inherit;
+      line-height: inherit;
+      text-align: center;
+      text-decoration: none;
+      text-shadow: inherit;
+    }
+
+    .route-step-link:focus-visible {
+      outline: 3px solid #fff3d4;
+      outline-offset: 3px;
+    }
+
+    .route-step,
+    .complete-link {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      width: min(170px, calc(100% - 12px));
+      min-height: 56px;
+      place-items: center;
+      padding: 12px;
+      color: #fff;
+      background: rgb(36 27 17 / 90%);
+      border: 2px solid #f0d7a2;
+      border-radius: 8px;
+      font: 600 1rem Georgia, "Times New Roman", serif;
+      text-align: center;
+      animation: waypoint-arrive 650ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+      transition: transform 180ms ease;
+    }
+
+    .phase-status {
+      display: block;
+      color: #e7d5ad;
+      font: 700 0.58rem Georgia, "Times New Roman", serif;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .route-step.is-complete {
+      border-color: #f2d176;
+      box-shadow: inset 0 0 0 2px rgb(240 215 162 / 30%), 0 0 16px rgb(242 209 118 / 38%), 0 5px 14px rgb(10 20 29 / 55%);
+    }
+
+    .route-step.is-complete .phase-status {
+      color: #f5dc8e;
+    }
+
+    .route-step.is-locked {
+      filter: saturate(0.55);
+      opacity: 0.74;
+    }
+
+    .route-step.is-locked .route-step-link,
+    .complete-link.is-locked {
+      cursor: not-allowed;
+    }
+
+    .route-step:nth-child(1) {
+      animation-delay: 120ms;
+    }
+
+    .route-step:nth-child(2) {
+      animation-delay: 260ms;
+    }
+
+    .route-step:nth-child(3) {
+      animation-delay: 400ms;
+    }
+
+    .complete-link {
+      animation-delay: 540ms;
+    }
+
+    .route-step:hover {
+      transform: translateY(-4px);
+    }
+
+    .route-step:nth-child(1) {
+      grid-column: 1;
+      align-self: start;
+      margin-top: 20px;
+      grid-template-rows: 28px auto auto auto;
+      gap: 3px;
+      min-height: 104px;
+      padding: 8px 12px;
+      background:
+        radial-gradient(ellipse at 50% 112%, rgb(93 153 174 / 42%) 0 24%, transparent 25%),
+        linear-gradient(135deg, transparent 47%, rgb(255 255 255 / 7%) 48% 52%, transparent 53%),
+        linear-gradient(180deg, #294b60, #112b3d);
+      border: 2px solid #d5ad65;
+      box-shadow: inset 0 0 0 2px rgb(240 215 162 / 20%), 0 5px 14px rgb(10 20 29 / 55%);
+      text-shadow: 0 1px 2px #071722;
+    }
+
+    .route-step-vessel {
+      width: 58px;
+      height: 28px;
+      filter: drop-shadow(0 1px 1px rgb(0 0 0 / 55%));
+    }
+
+    .route-step:nth-child(2) {
+      grid-column: 2;
+      align-self: end;
+      grid-template-rows: 28px auto auto auto;
+      gap: 3px;
+      min-height: 104px;
+      margin-bottom: 20px;
+      padding: 8px 10px;
+      background:
+        repeating-linear-gradient(90deg, transparent 0 18px, rgb(255 221 160 / 7%) 19px 20px),
+        radial-gradient(ellipse at 50% 110%, rgb(177 93 66 / 35%) 0 30%, transparent 31%),
+        linear-gradient(180deg, #62353a, #2d2029);
+      border: 2px solid #c99a61;
+      box-shadow: inset 0 0 0 2px rgb(231 195 133 / 16%), 0 5px 14px rgb(20 10 14 / 55%);
+      text-shadow: 0 1px 2px #1c1117;
+    }
+
+    .route-step-puppet {
+      width: 38px;
+      height: 28px;
+      filter: drop-shadow(0 1px 1px rgb(0 0 0 / 55%));
+    }
+
+    .route-step-caption {
+      color: #e4c47f;
+      font: 700 0.58rem Georgia, "Times New Roman", serif;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .route-step:nth-child(3) {
+      grid-column: 3;
+      grid-template-rows: 28px auto auto auto;
+      gap: 3px;
+      min-height: 104px;
+      padding: 8px 8px;
+      background:
+        radial-gradient(ellipse at 50% 115%, rgb(110 160 103 / 32%) 0 28%, transparent 29%),
+        repeating-linear-gradient(135deg, transparent 0 12px, rgb(255 240 173 / 5%) 13px 14px),
+        linear-gradient(180deg, #43634a, #1d342c);
+      border: 2px solid #d5ad65;
+      box-shadow: inset 0 0 0 2px rgb(240 215 162 / 16%), 0 5px 14px rgb(12 22 15 / 55%);
+      font-size: 0.88rem;
+      line-height: 1.15;
+      text-shadow: 0 1px 2px #102018;
+    }
+
+    .route-step-market {
+      width: 42px;
+      height: 28px;
+      filter: drop-shadow(0 1px 1px rgb(0 0 0 / 55%));
+    }
+
+    .complete-link {
+      grid-column: 4;
+      grid-template-rows: 40px auto;
+      gap: 4px;
+      min-height: 88px;
+      padding: 8px 12px;
+      color: #fff1bd;
+      background:
+        linear-gradient(90deg, transparent 46%, rgb(255 224 134 / 14%) 47% 53%, transparent 54%),
+        linear-gradient(180deg, #a8662e, #58351f);
+      border: 3px solid #e8c66d;
+      box-shadow: inset 0 0 0 2px rgb(255 232 159 / 22%), 0 7px 16px rgb(24 15 7 / 60%);
+      text-shadow: 0 1px 2px #321b0d;
+      text-decoration: none;
+      transition: box-shadow 180ms ease;
+    }
+
+    .complete-link:hover {
+      box-shadow: inset 0 0 0 2px rgb(255 232 159 / 35%), 0 10px 20px rgb(24 15 7 / 70%);
+      transform: translateY(-4px);
+    }
+
+    .complete-link.is-locked:hover {
+      box-shadow: inset 0 0 0 2px rgb(255 232 159 / 22%), 0 7px 16px rgb(24 15 7 / 60%);
+      transform: none;
+    }
+
+    .treasure-chest {
+      width: 52px;
+      height: 40px;
+      filter: drop-shadow(0 2px 2px rgb(0 0 0 / 45%));
+      animation: chest-glimmer 2.4s ease-in-out 1.2s infinite;
+    }
+
+    .complete-link:focus-visible {
+      outline: 3px solid #fff1bd;
+      outline-offset: 4px;
+    }
+
+    .reset-progress {
+      padding: 10px 16px;
+      color: #fff3d4;
+      background: rgb(36 27 17 / 88%);
+      border: 1px solid #d5ad65;
+      border-radius: 6px;
+      font: 600 0.9rem Georgia, "Times New Roman", serif;
+      cursor: pointer;
+      transition: background-color 180ms ease, transform 180ms ease;
+    }
+
+    .map-controls {
+      display: grid;
+      justify-items: center;
+      gap: 8px;
+    }
+
+    .reset-progress:hover:not(:disabled) {
+      background: #55391d;
+      transform: translateY(-2px);
+    }
+
+    .reset-progress:disabled {
+      cursor: not-allowed;
+      opacity: 0.65;
+    }
+
+    .reset-progress:focus-visible {
+      outline: 3px solid #fff1bd;
+      outline-offset: 3px;
+    }
+
+    .progress-message {
+      max-width: min(460px, 94vw);
+      margin: 0;
+      color: #fff3d4;
+      font: 600 0.85rem Georgia, "Times New Roman", serif;
+      text-align: center;
+      text-shadow: 0 1px 3px #241b11;
+    }
+
+    .battlefield {
+      position: relative;
+      width: min(460px, 94vw);
+      height: 104px;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse at 18% 82%, rgb(101 117 75 / 80%) 0 18%, transparent 19%),
+        radial-gradient(ellipse at 82% 88%, rgb(101 117 75 / 80%) 0 25%, transparent 26%),
+        linear-gradient(180deg, #a9c1bd 0 54%, #829178 55% 69%, #554b35 70%);
+      border: 2px solid #76502f;
+      border-radius: 8px;
+      box-shadow: inset 0 0 0 3px rgb(255 246 221 / 35%), 0 5px 16px rgb(22 16 8 / 30%);
+    }
+
+    .battlefield::before,
+    .battlefield::after {
+      position: absolute;
+      right: 0;
+      left: 0;
+      content: "";
+      pointer-events: none;
+    }
+
+    .battlefield::before {
+      bottom: 12px;
+      height: 16px;
+      background:
+        radial-gradient(ellipse at 12% 100%, #756345 0 35%, transparent 37%),
+        radial-gradient(ellipse at 38% 100%, #66563a 0 42%, transparent 44%),
+        radial-gradient(ellipse at 72% 100%, #756345 0 38%, transparent 40%),
+        radial-gradient(ellipse at 94% 100%, #66563a 0 32%, transparent 34%);
+      opacity: 0.85;
+    }
+
+    .battlefield::after {
+      bottom: 8px;
+      border-top: 2px dashed rgb(239 213 155 / 55%);
+    }
+
+    .soldier-runner {
+      position: absolute;
+      bottom: 12px;
+      left: -52px;
+      width: 42px;
+      height: 62px;
+      color: #293b34;
+      animation: run-across 6s linear infinite;
+    }
+
+    .soldier-runner:nth-of-type(2) {
+      animation-delay: -2s;
+      color: #3b4637;
+    }
+
+    .soldier-runner:nth-of-type(3) {
+      animation-delay: -4s;
+      color: #463c31;
+    }
+
+    .soldier-pose {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      filter: drop-shadow(0 2px 1px rgb(37 34 25 / 30%));
+      animation: running-bob 220ms ease-in-out infinite alternate;
+    }
+
+    @keyframes run-across {
+      to {
+        left: calc(100% + 4px);
+      }
+    }
+
+    @keyframes running-bob {
+      to {
+        transform: translateY(-3px);
+      }
+    }
+
+    @keyframes waypoint-arrive {
+      from {
+        opacity: 0;
+        transform: translateY(16px) scale(0.94);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes route-travel {
+      to {
+        stroke-dashoffset: -38;
+      }
+    }
+
+    @keyframes beast-drift {
+      50% {
+        transform: translateY(-4px);
+      }
+    }
+
+    @keyframes chest-glimmer {
+      50% {
+        filter: drop-shadow(0 0 8px rgb(255 220 112 / 85%));
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+      }
+
+      .soldier-runner {
+        animation: none;
+      }
+
+      .soldier-runner:nth-of-type(1) {
+        left: 14%;
+      }
+
+      .soldier-runner:nth-of-type(2) {
+        left: 43%;
+      }
+
+      .soldier-runner:nth-of-type(3) {
+        left: 72%;
+      }
+
+      .soldier-pose {
+        animation: none;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .route-map {
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(4, 150px);
+        width: min(360px, calc(100vw - 32px));
+        height: 600px;
+      }
+
+      .route-connectors path {
+        stroke-width: 8;
+      }
+
+      .route-connectors .desktop-path {
+        display: none;
+      }
+
+      .route-connectors .mobile-path {
+        display: block;
+      }
+
+      .route-step,
+      .complete-link {
+        grid-column: 1;
+        width: min(220px, 90%);
+        margin: 0;
+      }
+
+      .route-step:nth-child(1) {
+        grid-column: 1;
+        grid-row: 1;
+        margin: 0;
+      }
+
+      .route-step:nth-child(2) {
+        grid-column: 1;
+        grid-row: 2;
+        margin: 0;
+      }
+
+      .route-step:nth-child(3) {
+        grid-column: 1;
+        grid-row: 3;
+      }
+
+      .complete-link {
+        grid-row: 4;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="background">
+    <img src="japan backround.jpg" alt="">
+  </div>
+  <main>
+    <div class="map-content">
+      <nav class="route-map" aria-label="Japan quest route">
+      <svg class="map-beast" viewBox="0 0 1000 600" preserveAspectRatio="none" aria-hidden="true">
+        <g transform="translate(820 430)" stroke="#315d62" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 22c18-23 42-19 48 0s27 25 41 5 34-18 46 0" fill="none" stroke-width="12"></path>
+          <path d="M18 22c-10-12-5-23 7-24l16 9-9 19z" fill="#315d62" stroke-width="3"></path>
+          <path d="m67 21-9-17-12 16m48 2 10-17 8 20m28 0 15-12-2 22z" fill="#497c78" stroke-width="3"></path>
+          <circle cx="23" cy="7" r="2.5" fill="#f1d176" stroke="none"></circle>
+          <path d="M8 42c8-5 16 5 24 0s16 5 24 0m47 2c8-5 16 5 24 0s16 5 24 0" fill="none" stroke="#719da0" stroke-width="3"></path>
+        </g>
+      </svg>
+      <svg class="route-connectors" viewBox="0 0 1000 600" preserveAspectRatio="none" aria-hidden="true">
+        <path class="desktop-path" d="M 125 90 C 220 25 300 165 255 220 C 210 275 310 315 350 385 C 395 465 285 480 340 530 C 395 580 465 520 410 470 C 355 420 455 370 515 345 C 575 320 615 370 645 325 C 675 280 585 235 625 280 C 665 325 700 350 740 310 C 780 270 710 215 765 220 C 820 225 805 285 875 300"></path>
+        <path class="mobile-path" d="M 500 75 C 700 75 745 150 580 150 C 440 150 485 205 600 195 C 730 185 680 240 500 225 C 280 210 260 285 420 300 C 550 310 520 360 390 350 C 260 340 300 405 500 375 C 700 345 745 430 580 450 C 440 470 485 520 600 510 C 730 500 680 545 500 525"></path>
+      </svg>
+      <ol class="route-steps">
+        <li class="route-step">
+          <a class="route-step-link" href="Japan%20Phase1.html">
+            <svg class="route-step-vessel" viewBox="0 0 100 48" aria-hidden="true">
+              <path d="M8 30h84l-12 12H22z" fill="#d5ad65"></path>
+              <path d="M22 28h55l-5-8H39l-4-7H26z" fill="#f1dfb8"></path>
+              <path d="M45 13h8V7h-8zm19 7h8v-6h-8z" fill="#d5ad65"></path>
+              <path d="M30 33h41M18 45c7-4 14 4 21 0s14 4 21 0 14 4 21 0" fill="none" stroke="#90c4d2" stroke-linecap="round" stroke-width="2"></path>
+            </svg>
+            <span>Phase 1: Arrival</span>
+            <span class="route-step-caption">Naval Campaign</span>
+            <span class="phase-status" aria-live="polite">Not complete</span>
+          </a>
+        </li>
+        <li class="route-step">
+          <a class="route-step-link" href="Japan%20Phase2.html">
+            <svg class="route-step-puppet" viewBox="0 0 80 56" aria-hidden="true">
+              <path d="M17 7h46M25 7l5 13m25-13-5 13" fill="none" stroke="#e0b875" stroke-linecap="round" stroke-width="3"></path>
+              <circle cx="42" cy="21" r="7" fill="#d7a66a" stroke="#291d22" stroke-width="2"></circle>
+              <path d="M42 28v12m0-8-14 8m14-8 14 8m-14 0-9 12m9-12 9 12" fill="none" stroke="#e0b875" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"></path>
+              <circle cx="28" cy="40" r="2" fill="#f1d176"></circle>
+              <circle cx="56" cy="40" r="2" fill="#f1d176"></circle>
+            </svg>
+            <span>Phase 2: Puppetry</span>
+            <span class="route-step-caption">Puppet Stage</span>
+            <span class="phase-status" aria-live="polite">Locked</span>
+          </a>
+        </li>
+        <li class="route-step">
+          <a class="route-step-link" href="Japan%20Phase3.html">
+            <svg class="route-step-market" viewBox="0 0 80 56" aria-hidden="true">
+              <path d="M15 20 21 7h38l6 13z" fill="#c68e35" stroke="#f1d176" stroke-width="2"></path>
+              <path d="M25 8 22 20m15-12v12m14-12 3 12" stroke="#fff0a7" stroke-width="3"></path>
+              <path d="M15 21h50v26H15z" fill="#355b42" stroke="#f1d176" stroke-width="2"></path>
+              <path d="M12 32h56v6H12z" fill="#d5ad65"></path>
+              <path d="M25 38h30v9H25z" fill="#493722"></path>
+              <circle cx="20" cy="30" r="4" fill="#edc85f" stroke="#805323" stroke-width="1"></circle>
+              <circle cx="60" cy="30" r="4" fill="#edc85f" stroke="#805323" stroke-width="1"></circle>
+            </svg>
+            <span>Phase 3: Black Market</span>
+            <span class="route-step-caption">Black Market</span>
+            <span class="phase-status" aria-live="polite">Locked</span>
+          </a>
+        </li>
+      </ol>
+      <a class="complete-link" href="lobby.html">
+        <svg class="treasure-chest" viewBox="0 0 80 56" aria-hidden="true">
+          <circle cx="18" cy="12" r="5" fill="#f8d96f" stroke="#9c6722" stroke-width="2"></circle>
+          <circle cx="62" cy="10" r="4" fill="#f8d96f" stroke="#9c6722" stroke-width="2"></circle>
+          <path d="M13 21a27 17 0 0 1 54 0v5H13z" fill="#b87936" stroke="#f1d176" stroke-width="3"></path>
+          <path d="M10 26h60v22H10z" fill="#75431f" stroke="#f1d176" stroke-width="3"></path>
+          <path d="M20 27v20m40-20v20M10 34h60" fill="none" stroke="#d7a84c" stroke-width="4"></path>
+          <path d="M35 32h10v12H35z" fill="#f4d36f" stroke="#8b571f" stroke-width="2"></path>
+          <circle cx="40" cy="36" r="1.5" fill="#70421d"></circle>
+        </svg>
+        <span>Complete Quest</span>
+      </a>
+      </nav>
+      <div class="map-controls">
+        <button class="reset-progress" type="button" disabled>Reset Japan Progress</button>
+        <p class="progress-message" aria-live="polite">Complete each phase to unlock the next one.</p>
+      </div>
+      <div class="battlefield" aria-hidden="true">
+        <div class="soldier-runner">
+          <svg class="soldier-pose" viewBox="0 0 56 70">
+            <path d="M17 17c0-7 5-12 12-12s12 5 12 12l-3 3H20z" fill="currentColor"></path>
+            <path d="M15 18h29l-4-4H19z" fill="#b68e4e"></path>
+            <circle cx="29" cy="21" r="7" fill="#d2a66c"></circle>
+            <path d="m22 28 13-1 7 19-17 3-7-13z" fill="currentColor"></path>
+            <path d="m23 32-9 13 4 3 12-10m11-6 8 11-4 3-12-9" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="5"></path>
+            <path d="m28 47-12 10 4 4 16-9m4-6 9 10-4 4-13-8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="6"></path>
+            <path d="m9 31 24-8m-19 2 3 7m17-19 7-2 2 3-7 3" fill="none" stroke="#382f25" stroke-linecap="round" stroke-width="2.5"></path>
+          </svg>
+        </div>
+        <div class="soldier-runner">
+          <svg class="soldier-pose" viewBox="0 0 56 70">
+            <path d="M17 17c0-7 5-12 12-12s12 5 12 12l-3 3H20z" fill="currentColor"></path>
+            <path d="M15 18h29l-4-4H19z" fill="#b68e4e"></path>
+            <circle cx="29" cy="21" r="7" fill="#d2a66c"></circle>
+            <path d="m22 28 13-1 7 19-17 3-7-13z" fill="currentColor"></path>
+            <path d="m23 32-9 13 4 3 12-10m11-6 8 11-4 3-12-9" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="5"></path>
+            <path d="m28 47-12 10 4 4 16-9m4-6 9 10-4 4-13-8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="6"></path>
+            <path d="m9 31 24-8m-19 2 3 7m17-19 7-2 2 3-7 3" fill="none" stroke="#382f25" stroke-linecap="round" stroke-width="2.5"></path>
+          </svg>
+        </div>
+        <div class="soldier-runner">
+          <svg class="soldier-pose" viewBox="0 0 56 70">
+            <path d="M17 17c0-7 5-12 12-12s12 5 12 12l-3 3H20z" fill="currentColor"></path>
+            <path d="M15 18h29l-4-4H19z" fill="#b68e4e"></path>
+            <circle cx="29" cy="21" r="7" fill="#d2a66c"></circle>
+            <path d="m22 28 13-1 7 19-17 3-7-13z" fill="currentColor"></path>
+            <path d="m23 32-9 13 4 3 12-10m11-6 8 11-4 3-12-9" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="5"></path>
+            <path d="m28 47-12 10 4 4 16-9m4-6 9 10-4 4-13-8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="6"></path>
+            <path d="m9 31 24-8m-19 2 3 7m17-19 7-2 2 3-7 3" fill="none" stroke="#382f25" stroke-linecap="round" stroke-width="2.5"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </main>
+  <script>
+    const phaseIds = ["1", "2", "3"];
+    const phaseKey = (phaseId) => `historyrunnn.japan.phase.${phaseId}`;
+    const questKey = "historyrunnn.quest.japan";
+    const isPhaseComplete = (phaseId) => localStorage.getItem(phaseKey(phaseId)) === "finished";
+    const progressMessage = document.querySelector(".progress-message");
+
+    const updateProgress = () => {
+      document.querySelectorAll(".route-step").forEach((step, index) => {
+        const phaseId = phaseIds[index];
+        const isComplete = isPhaseComplete(phaseId);
+        const isUnlocked = index === 0 || isPhaseComplete(phaseIds[index - 1]);
+        const link = step.querySelector(".route-step-link");
+        step.classList.toggle("is-complete", isComplete);
+        step.classList.toggle("is-locked", !isUnlocked);
+        step.querySelector(".phase-status").textContent = isComplete ? "✓ Complete" : isUnlocked ? "Not complete" : "Locked";
+        link.dataset.unlocked = String(isUnlocked);
+        link.setAttribute("aria-disabled", String(!isUnlocked));
+        if (!isUnlocked) {
+          link.setAttribute("aria-label", `Phase ${phaseId}, locked. Complete Phase ${index} first.`);
+        } else {
+          link.removeAttribute("aria-label");
+        }
+      });
+
+      const allPhasesComplete = phaseIds.every(isPhaseComplete);
+      if (allPhasesComplete) {
+        localStorage.setItem(questKey, "finished");
+      } else {
+        localStorage.removeItem(questKey);
+      }
+
+      const completeLink = document.querySelector(".complete-link");
+      completeLink.classList.toggle("is-locked", !allPhasesComplete);
+      completeLink.dataset.unlocked = String(allPhasesComplete);
+      completeLink.setAttribute("aria-disabled", String(!allPhasesComplete));
+      completeLink.querySelector("span").textContent = allPhasesComplete ? "Quest Complete!" : "Complete Quest";
+      document.querySelector(".reset-progress").disabled = !phaseIds.some(isPhaseComplete);
+    };
+
+    document.querySelectorAll(".route-step-link, .complete-link").forEach((link) => {
+      link.addEventListener("click", (event) => {
+        if (link.dataset.unlocked !== "true") {
+          event.preventDefault();
+          const step = link.closest(".route-step");
+          if (step) {
+            const phaseNumber = Array.prototype.indexOf.call(document.querySelectorAll(".route-step"), step) + 1;
+            progressMessage.textContent = `Complete Phase ${phaseNumber - 1} to unlock Phase ${phaseNumber}.`;
+          } else {
+            progressMessage.textContent = "Complete all three phases to finish the Japan Quest.";
+          }
+        }
+      });
+    });
+
+    document.querySelector(".reset-progress").addEventListener("click", () => {
+      if (!window.confirm("Reset all Japan phase progress?")) {
+        return;
+      }
+
+      phaseIds.forEach((phaseId) => localStorage.removeItem(phaseKey(phaseId)));
+      updateProgress();
+      progressMessage.textContent = "Japan progress has been reset. Complete Phase 1 to begin.";
+    });
+
+    updateProgress();
+  </script>
+  <script src="site-audio.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#493722">
+  <title>HistoryRunnn | The Puppet President</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: #fff8e9;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .background {
+      position: fixed;
+      z-index: -1;
+      inset: 0;
+    }
+
+    .background img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    main {
+      display: grid;
+      min-height: 100vh;
+      min-height: 100svh;
+      place-items: center;
+      padding: clamp(16px, 4vw, 36px);
+    }
+
+    .phase-board {
+      position: relative;
+      isolation: isolate;
+      width: min(100%, 900px);
+      padding: clamp(22px, 5vw, 52px);
+      color: #493722;
+      background:
+        radial-gradient(ellipse at 12% 18%, rgb(128 86 43 / 12%), transparent 26%),
+        radial-gradient(ellipse at 88% 82%, rgb(128 86 43 / 10%), transparent 24%),
+        repeating-linear-gradient(1deg, rgb(121 82 40 / 4%) 0 1px, transparent 1px 6px),
+        linear-gradient(135deg, #f7e8c7, #dbbd85);
+      border: clamp(8px, 1.5vw, 16px) ridge #805b32;
+      border-radius: 12px;
+      box-shadow: 0 18px 60px rgb(25 18 10 / 55%), inset 0 0 0 3px rgb(255 246 221 / 55%), inset 0 0 28px rgb(95 61 24 / 14%);
+    }
+
+    .phase-content[hidden] {
+      display: none;
+    }
+
+    .phase-locked {
+      padding: clamp(18px, 5vw, 32px);
+      background: rgb(255 249 228 / 65%);
+      border: 2px dashed #805b32;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .phase-locked h1 {
+      margin-bottom: 16px;
+    }
+
+    .phase-locked p {
+      line-height: 1.6;
+    }
+
+    .branch-header {
+      position: relative;
+      display: flex;
+      min-height: 270px;
+      align-items: center;
+      margin-bottom: 18px;
+      padding-right: clamp(150px, 31%, 250px);
+    }
+
+    .branch-title {
+      position: relative;
+      z-index: 1;
+    }
+
+    .laurel-portrait {
+      position: absolute;
+      top: 0;
+      right: -12px;
+      z-index: 0;
+      width: auto;
+      height: 270px;
+      max-width: 36%;
+      object-fit: contain;
+      object-position: center top;
+      opacity: 0.5;
+      pointer-events: none;
+      transform: rotate(7deg);
+      mix-blend-mode: multiply;
+      mask-image: linear-gradient(to bottom, #000 68%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, #000 68%, transparent 100%);
+    }
+
+    .phase-board > :not(.laurel-portrait) {
+      position: relative;
+      z-index: 1;
+    }
+
+    .phase-label {
+      margin: 0 0 12px;
+      color: #76552f;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      color: #5f4225;
+      font-size: clamp(1.8rem, 6vw, 3rem);
+      font-variant: small-caps;
+      line-height: 1.15;
+      text-shadow: 0 1px 0 rgb(255 248 230 / 70%);
+    }
+
+    .phase-intro {
+      margin: 18px 0 24px;
+      font-size: 1.05rem;
+      line-height: 1.65;
+      text-align: left;
+    }
+
+    .event-list {
+      display: grid;
+      gap: 12px;
+      margin: 0 0 28px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .event-item {
+      padding: 14px 18px;
+      background: rgb(255 249 228 / 56%);
+      border-left: 4px solid #805b32;
+      box-shadow: inset 0 0 0 1px rgb(122 83 40 / 16%);
+    }
+
+    .event-item h2 {
+      margin: 0 0 5px;
+      color: #674723;
+      font-size: 1.05rem;
+    }
+
+    .event-item p {
+      margin: 0;
+      font-size: 0.98rem;
+      line-height: 1.55;
+    }
+
+    @media (max-width: 600px) {
+      .branch-header {
+        min-height: 230px;
+        padding-right: 130px;
+      }
+
+      .laurel-portrait {
+        top: 0;
+        height: 220px;
+        max-width: 50%;
+        transform: rotate(5deg);
+      }
+    }
+
+    .return-link {
+      display: inline-block;
+      padding: 12px 20px;
+      color: #fff3d4;
+      background: linear-gradient(180deg, #805a2e, #55391d);
+      border: 1px solid #cba66a;
+      border-radius: 6px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .return-link:focus-visible {
+      outline: 2px solid #f0cd88;
+      outline-offset: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div class="background">
+    <img src="japan backround.jpg" alt="">
+  </div>
+  <main>
+    <article class="phase-board">
+      <section class="phase-locked">
+        <p class="phase-label">Japan Quest</p>
+        <h1>Minor Branch is Locked</h1>
+        <p>Complete Phase 1 before you can explore the Phase 2 branch.</p>
+        <a class="return-link" href="japan.html">Return to Japan Map</a>
+      </section>
+      <div class="phase-content" hidden>
+      <header>
+        <img class="laurel-portrait" src="jose-transparent.png" alt="Portrait of José P. Laurel">
+        <div class="branch-title">
+          <p class="phase-label">Japan Quest | Phase 2 Minor Branch</p>
+          <h1>Quest: The Puppet President (1943–1945)</h1>
+        </div>
+      </header>
+      <p class="phase-intro">
+        José P. Laurel is appointed by Imperial Japan to lead the Second Philippine Republic, serving as a buffer between the occupying army and the Filipino people.
+      </p>
+      <ul class="event-list">
+        <li class="event-item">
+          <h2>The Appointment</h2>
+          <p>Left behind by President Quezon to protect civilians, Laurel becomes president of the Japanese-sponsored puppet government on October 14, 1943.</p>
+        </li>
+        <li class="event-item">
+          <h2>Limited Power</h2>
+          <p>Despite holding the highest office, Laurel operates under strict Japanese military surveillance with zero real autonomy.</p>
+        </li>
+        <li class="event-item">
+          <h2>Silent Defiance</h2>
+          <p>He successfully blocks Japanese demands to conscript Filipinos into fighting against the Allies, surviving multiple guerrilla assassination attempts in the process.</p>
+        </li>
+        <li class="event-item">
+          <h2>Forced Compliance</h2>
+          <p>Under intense pressure from Tokyo, Laurel declares a state of war against the United States and Great Britain in September 1944, though he refuses to enforce a military draft.</p>
+        </li>
+        <li class="event-item">
+          <h2>The Dissolution</h2>
+          <p>Retreating to Japan as Allied forces liberate the islands, Laurel formally dissolves the puppet regime on August 17, 1945, and is later granted amnesty from treason charges.</p>
+        </li>
+      </ul>
+      <a class="return-link" href="Japan%20Phase2.html">Return to Phase 2</a>
+      </div>
+    </article>
+  </main>
+  <script>
+    const isUnlocked = localStorage.getItem("historyrunnn.japan.phase.1") === "finished";
+    document.querySelector(".phase-content").hidden = !isUnlocked;
+    document.querySelector(".phase-locked").hidden = isUnlocked;
+  </script>
+  <script src="site-audio.js" defer></script>
+</body>
+</html>

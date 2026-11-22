@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#493722">
+  <title>HistoryRunnn | America Quest</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+    }
+
+    .background {
+      position: fixed;
+      z-index: -1;
+      inset: 0;
+    }
+
+    .background img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .background::after {
+      position: absolute;
+      inset: 0;
+      background: rgb(36 27 17 / 48%);
+      content: "";
+    }
+
+    main {
+      display: grid;
+      min-height: 100vh;
+      min-height: 100svh;
+      place-items: center;
+      padding: 24px 0;
+    }
+
+    .route-map {
+      position: relative;
+      isolation: isolate;
+      display: grid;
+      width: min(1100px, 94vw);
+      height: 320px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      align-items: center;
+      justify-items: center;
+      background:
+        radial-gradient(ellipse 58px 25px at 18% 72%, #788458 0 43%, #c4a06a 46% 57%, transparent 61%),
+        radial-gradient(ellipse 48px 23px at 54% 19%, #788458 0 43%, #c4a06a 46% 57%, transparent 61%),
+        radial-gradient(ellipse 54px 24px at 82% 84%, #788458 0 43%, #c4a06a 46% 57%, transparent 61%),
+        repeating-radial-gradient(ellipse at 28% 42%, transparent 0 23px, rgb(94 119 89 / 10%) 24px 25px, transparent 26px 48px),
+        radial-gradient(ellipse at 77% 72%, rgb(108 158 165 / 16%) 0 15%, transparent 16%),
+        linear-gradient(150deg, transparent 0 43%, rgb(91 111 78 / 18%) 43.2% 55%, transparent 55.2%),
+        linear-gradient(32deg, transparent 0 42%, rgb(125 145 99 / 22%) 42.2% 55%, transparent 55.2%),
+        repeating-linear-gradient(3deg, rgb(103 70 35 / 5%) 0 1px, transparent 1px 6px),
+        linear-gradient(135deg, #f1e2bb, #c9ab72);
+      border: 10px ridge #76502f;
+      border-radius: 14px;
+      box-shadow: 0 16px 38px rgb(22 16 8 / 48%), inset 0 0 0 3px rgb(255 246 221 / 55%), inset 0 0 28px rgb(91 59 28 / 20%);
+    }
+
+    .route-map::before {
+      position: absolute;
+      z-index: 0;
+      inset: 8px;
+      background:
+        radial-gradient(circle at 0 0, #9b713f 0 3px, #f4dfb6 4px 5px, transparent 6px),
+        radial-gradient(circle at 100% 0, #9b713f 0 3px, #f4dfb6 4px 5px, transparent 6px),
+        radial-gradient(circle at 0 100%, #9b713f 0 3px, #f4dfb6 4px 5px, transparent 6px),
+        radial-gradient(circle at 100% 100%, #9b713f 0 3px, #f4dfb6 4px 5px, transparent 6px);
+      border: 1px solid rgb(112 75 38 / 50%);
+      content: "";
+      pointer-events: none;
+    }
+
+    .map-art {
+      position: absolute;
+      z-index: 0;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.85;
+      pointer-events: none;
+    }
+
+    .route-map::after {
+      position: absolute;
+      top: 16px;
+      right: 24px;
+      z-index: 2;
+      color: #76502f;
+      content: "N  ↑";
+      font: 700 0.7rem Georgia, "Times New Roman", serif;
+      letter-spacing: 0.12em;
+      pointer-events: none;
+    }
+
+    .route-connectors {
+      position: absolute;
+      z-index: 0;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .route-connectors path {
+      fill: none;
+      stroke: #80552f;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 8;
+      stroke-dasharray: 1 18;
+      filter: drop-shadow(0 1px 2px rgb(44 27 12 / 65%));
+    }
+
+    .route-connectors .mobile-path {
+      display: none;
+    }
+
+    .route-steps {
+      display: contents;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .route-step,
+    .complete-link {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      width: min(170px, calc(100% - 12px));
+      min-height: 56px;
+      place-items: center;
+      padding: 12px;
+      color: #fff;
+      background: rgb(36 27 17 / 90%);
+      border: 2px solid #f0d7a2;
+      border-radius: 8px;
+      font: 600 1rem Georgia, "Times New Roman", serif;
+      text-align: center;
+    }
+
+    .route-step-link {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-rows: 28px auto auto auto;
+      gap: 3px;
+      width: 100%;
+      height: 100%;
+      place-items: center;
+      padding: 8px 10px;
+      color: inherit;
+      border-radius: inherit;
+      font: inherit;
+      line-height: inherit;
+      text-align: center;
+      text-decoration: none;
+    }
+
+    .route-step-link:focus-visible,
+    .complete-link:focus-visible {
+      outline: 3px solid #fff3d4;
+      outline-offset: 3px;
+    }
+
+    .route-step-status {
+      color: #f0d39a;
+      font: 700 0.58rem Georgia, "Times New Roman", serif;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .route-step.is-complete {
+      border-color: #f1d176;
+      box-shadow: inset 0 0 0 2px rgb(240 215 162 / 30%), 0 0 16px rgb(242 209 118 / 38%), 0 5px 14px rgb(10 20 29 / 55%);
+    }
+
+    .route-step.is-locked {
+      filter: saturate(0.55);
+      opacity: 0.74;
+    }
+
+    .route-step.is-locked .route-step-link,
+    .complete-link.is-locked {
+      cursor: not-allowed;
+    }
+
+    .route-step:nth-child(1) {
+      grid-column: 1;
+      align-self: end;
+      margin-bottom: 22px;
+      grid-template-rows: 30px auto auto auto;
+      gap: 3px;
+      min-height: 104px;
+      padding: 8px 10px;
+      background:
+        repeating-linear-gradient(90deg, transparent 0 17px, rgb(255 239 217 / 8%) 18px 19px),
+        linear-gradient(180deg, #8b493b, #542c2a);
+      border: 2px solid #dfb873;
+      box-shadow: inset 0 0 0 2px rgb(255 239 217 / 15%), 0 5px 14px rgb(20 10 14 / 55%);
+    }
+
+    .phase-emblem--arrival {
+      width: 42px;
+      height: 30px;
+    }
+
+    .phase-one-ship {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: ship-bob 2.8s ease-in-out infinite;
+    }
+
+    .phase-one-waves {
+      stroke-dasharray: 4 3;
+      animation: wave-drift 3s linear infinite;
+    }
+
+    @keyframes ship-bob {
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-2px);
+      }
+    }
+
+    @keyframes wave-drift {
+      to {
+        stroke-dashoffset: -14;
+      }
+    }
+
+    .route-step:nth-child(2) {
+      grid-column: 2;
+      align-self: start;
+      margin-top: 34px;
+      grid-template-rows: 30px auto auto auto;
+      min-height: 104px;
+      background:
+        repeating-linear-gradient(135deg, transparent 0 14px, rgb(255 255 255 / 5%) 15px 16px),
+        linear-gradient(180deg, #365775, #1d3448);
+      border: 2px solid #dfb873;
+      box-shadow: inset 0 0 0 2px rgb(240 215 162 / 15%), 0 5px 14px rgb(10 20 29 / 55%);
+    }
+
+    .phase-emblem--classroom {
+      width: 42px;
+      height: 30px;
+    }
+
+    .phase-two-chalk {
+      animation: chalk-glow 3.5s ease-in-out infinite;
+    }
+
+    .phase-two-book {
+      transform-box: fill-box;
+      transform-origin: center bottom;
+      animation: book-lift 3s ease-in-out infinite;
+    }
+
+    @keyframes chalk-glow {
+      0%,
+      100% {
+        opacity: 0.78;
+      }
+
+      50% {
+        opacity: 1;
+      }
+    }
+
+    @keyframes book-lift {
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-3px);
+      }
+    }
+
+    .route-step:nth-child(3) {
+      grid-column: 3;
+      grid-template-rows: 30px auto auto auto;
+      align-self: end;
+      margin-bottom: 22px;
+      min-height: 104px;
+      background:
+        radial-gradient(ellipse at 50% 115%, rgb(110 160 103 / 32%) 0 28%, transparent 29%),
+        linear-gradient(180deg, #536345, #293b30);
+      border: 2px solid #dfb873;
+      box-shadow: inset 0 0 0 2px rgb(240 215 162 / 15%), 0 5px 14px rgb(12 22 15 / 55%);
+    }
+
+    .phase-emblem--jones-law {
+      width: 42px;
+      height: 30px;
+    }
+
+    .phase-three-scroll {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: law-scroll-bob 3.2s ease-in-out infinite;
+    }
+
+    .phase-three-seal {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: law-seal-pulse 2.8s ease-in-out infinite;
+    }
+
+    @keyframes law-scroll-bob {
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-2px);
+      }
+    }
+
+    @keyframes law-seal-pulse {
+      0%,
+      100% {
+        opacity: 0.82;
+        transform: scale(0.94);
+      }
+
+      50% {
+        opacity: 1;
+        transform: scale(1.05);
+      }
+    }
+
+    .phase-emblem {
+      width: 38px;
+      height: 28px;
+      filter: drop-shadow(0 1px 1px rgb(0 0 0 / 55%));
+    }
+
+    .route-step-caption {
+      color: #f0d39a;
+      font: 700 0.58rem Georgia, "Times New Roman", serif;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .complete-link {
+      grid-column: 4;
+      align-self: start;
+      margin-top: 34px;
+      grid-template-rows: 40px auto;
+      gap: 4px;
+      min-height: 88px;
+      padding: 8px 12px;
+      color: #fff1bd;
+      background:
+        linear-gradient(90deg, transparent 46%, rgb(255 224 134 / 14%) 47% 53%, transparent 54%),
+        linear-gradient(180deg, #a8662e, #58351f);
+      border: 3px solid #e8c66d;
+      box-shadow: inset 0 0 0 2px rgb(255 232 159 / 22%), 0 7px 16px rgb(24 15 7 / 60%);
+      text-decoration: none;
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .complete-link:hover {
+      box-shadow: inset 0 0 0 2px rgb(255 232 159 / 35%), 0 10px 20px rgb(24 15 7 / 70%);
+      transform: translateY(-4px);
+    }
+
+    .complete-link.is-locked:hover {
+      box-shadow: inset 0 0 0 2px rgb(255 232 159 / 22%), 0 7px 16px rgb(24 15 7 / 60%);
+      transform: none;
+    }
+
+    .treasure-chest {
+      width: 52px;
+      height: 40px;
+      filter: drop-shadow(0 2px 2px rgb(0 0 0 / 45%));
+    }
+
+    .america-content {
+      display: grid;
+      justify-items: center;
+      gap: 14px;
+      width: 100%;
+    }
+
+    .map-controls {
+      display: grid;
+      justify-items: center;
+      gap: 8px;
+    }
+
+    .reset-progress {
+      padding: 10px 16px;
+      color: #fff3d4;
+      background: rgb(36 27 17 / 90%);
+      border: 1px solid #d5ad65;
+      border-radius: 6px;
+      font: 600 0.9rem Georgia, "Times New Roman", serif;
+      cursor: pointer;
+      transition: background-color 180ms ease, transform 180ms ease;
+    }
+
+    .reset-progress:hover:not(:disabled) {
+      background: #55391d;
+      transform: translateY(-2px);
+    }
+
+    .reset-progress:focus-visible {
+      outline: 3px solid #fff1bd;
+      outline-offset: 3px;
+    }
+
+    .reset-progress:disabled {
+      cursor: not-allowed;
+      opacity: 0.65;
+    }
+
+    .progress-message {
+      max-width: min(460px, 94vw);
+      margin: 0;
+      color: #fff3d4;
+      font: 600 0.85rem Georgia, "Times New Roman", serif;
+      text-align: center;
+      text-shadow: 0 1px 3px #241b11;
+    }
+
+    .america-landscape {
+      position: relative;
+      width: min(460px, 94vw);
+      height: 104px;
+      overflow: hidden;
+      background: linear-gradient(180deg, #adc9cf 0 56%, #6f8061 57% 100%);
+      border: 2px solid #76502f;
+      border-radius: 8px;
+      box-shadow: inset 0 0 0 3px rgb(255 246 221 / 35%), 0 5px 16px rgb(22 16 8 / 30%);
+    }
+
+    .landscape-mountains {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .eagle-flight {
+      position: absolute;
+      top: 8px;
+      left: -68px;
+      width: 60px;
+      height: 44px;
+      filter: drop-shadow(0 2px 1px rgb(37 34 25 / 35%));
+      animation: eagle-crossing 8s linear infinite;
+    }
+
+    .eagle-wing {
+      transform-box: view-box;
+      transform-origin: 50px 26px;
+      animation: eagle-flap 520ms ease-in-out infinite alternate;
+    }
+
+    @keyframes eagle-crossing {
+      to {
+        left: calc(100% + 8px);
+      }
+    }
+
+    @keyframes eagle-flap {
+      to {
+        transform: scaleY(0.65);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .eagle-flight {
+        left: calc(50% - 30px);
+        animation: none;
+      }
+
+      .eagle-wing {
+        animation: none;
+      }
+
+      .phase-two-chalk,
+      .phase-two-book,
+      .phase-one-ship,
+      .phase-one-waves,
+      .phase-three-scroll,
+      .phase-three-seal {
+        animation: none;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .route-map {
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(4, 150px);
+        width: min(360px, calc(100vw - 32px));
+        height: 600px;
+      }
+
+      .route-connectors .desktop-path {
+        display: none;
+      }
+
+      .route-connectors .mobile-path {
+        display: block;
+      }
+
+      .route-step,
+      .complete-link {
+        grid-column: 1;
+        width: min(220px, 90%);
+        margin: 0;
+      }
+
+      .route-step:nth-child(1) {
+        grid-column: 1;
+        grid-row: 1;
+        align-self: center;
+        margin: 0;
+      }
+
+      .route-step:nth-child(2) {
+        grid-column: 1;
+        grid-row: 2;
+        align-self: center;
+        margin: 0;
+      }
+
+      .route-step:nth-child(3) {
+        grid-column: 1;
+        grid-row: 3;
+        align-self: center;
+        margin: 0;
+      }
+
+      .complete-link {
+        grid-row: 4;
+        align-self: center;
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="background">
+    <img src="us backround.jpg" alt="">
+  </div>
+  <main>
+    <div class="america-content">
+      <nav class="route-map" aria-label="America quest route">
+      <svg class="map-art" viewBox="0 0 1000 600" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0 276 115 178l57 41 116-117 91 112 80-66 111 127 90-90 104-97 87 122 79-76 100 90v276H0z" fill="#60735c" opacity=".2"></path>
+        <path d="M0 446 83 344l43 40 94-152 85 135 60-67 87 129 88-143 70 67 94-164 86 136 72-83 138 142v216H0z" fill="#748158" opacity=".48"></path>
+        <path d="m201 261 19-29 19 38-14-8-10 7zm247 168 42-69 27 52-19-9-11 13zm223-218 64-113 54 86-25-13-19 18-13-18-22 26z" fill="#f3e7c7" opacity=".8"></path>
+        <path d="M78 127c100-60 141 69 230 13s119-40 174 8m-109 245c72-65 129 23 190-15s117-54 180-15" fill="none" stroke="#718a72" stroke-linecap="round" stroke-width="8" opacity=".42"></path>
+        <path d="M80 80h34m-17-17v34m190 422h28m-14-14v28m565-286h32m-16-16v32" stroke="#a8493b" stroke-linecap="round" stroke-width="4" opacity=".55"></path>
+      </svg>
+      <svg class="route-connectors" viewBox="0 0 1000 600" preserveAspectRatio="none" aria-hidden="true">
+        <path class="desktop-path" d="M 160 438 C 225 410 240 235 320 180 C 350 160 370 145 386 145 C 470 145 485 300 545 355 C 570 385 595 425 615 438 C 680 460 705 335 760 250 C 800 190 825 145 844 145"></path>
+        <path class="mobile-path" d="M 500 75 C 700 75 745 150 580 150 C 440 150 485 205 600 195 C 730 185 680 240 500 225 C 280 210 260 285 420 300 C 550 310 520 360 390 350 C 260 340 300 405 500 375 C 700 345 745 430 580 450 C 440 470 485 520 600 510 C 730 500 680 545 500 525"></path>
+      </svg>
+      <ol class="route-steps">
+        <li class="route-step">
+          <a class="route-step-link" href="America%20Phase1.html">
+            <svg class="phase-emblem phase-emblem--arrival" viewBox="0 0 80 56" aria-hidden="true">
+              <path class="phase-one-waves" d="M8 47c7-4 13 4 20 0s13 4 20 0 13 4 20 0" fill="none" stroke="#c3d6d7" stroke-linecap="round" stroke-width="3"></path>
+              <g class="phase-one-ship">
+                <path d="M11 31h58L60 42H23z" fill="#b86f43" stroke="#f1d176" stroke-linejoin="round" stroke-width="2"></path>
+                <path d="M22 29h37l-4-10H34l-4-6h-6z" fill="#d6d1bc" stroke="#fff3d4" stroke-linejoin="round" stroke-width="1.5"></path>
+                <path d="M34 13h7V7h-7zm17 6h7v-6h-7z" fill="#f1d176"></path>
+                <path d="M28 27h10v-5H28zm15 0h11v-5H43z" fill="#365775"></path>
+              </g>
+            </svg>
+            <span>Phase 1: Arrival</span>
+            <span class="route-step-caption">Manila Bay · 1898</span>
+            <span class="route-step-status">Not complete</span>
+          </a>
+        </li>
+        <li class="route-step">
+          <a class="route-step-link" href="America%20Phase2.html">
+            <svg class="phase-emblem phase-emblem--classroom" viewBox="0 0 80 56" aria-hidden="true">
+              <rect x="8" y="4" width="64" height="37" rx="3" fill="#294744" stroke="#f1d176" stroke-width="3"></rect>
+              <g class="phase-two-chalk" fill="#fff3d4" font-family="Georgia, serif" font-size="15" font-weight="700">
+                <text x="20" y="29">A</text>
+                <text x="35" y="29">B</text>
+                <text x="50" y="29">C</text>
+              </g>
+              <g class="phase-two-book">
+                <path d="M21 43c9-4 17-3 19 1v8c-5-4-12-5-19-2z" fill="#f3dfb2" stroke="#dfb873" stroke-width="1.5"></path>
+                <path d="M40 44c3-4 11-5 19-1v7c-7-3-14-2-19 2z" fill="#fff3d4" stroke="#dfb873" stroke-width="1.5"></path>
+                <path d="M40 44v8" stroke="#dfb873" stroke-width="1.5"></path>
+              </g>
+            </svg>
+            <span>Phase 2: Thomasites</span>
+            <span class="route-step-caption">Schools &amp; new ideas</span>
+            <span class="route-step-status">Locked</span>
+          </a>
+        </li>
+        <li class="route-step">
+          <a class="route-step-link" href="America%20Phase3.html">
+            <svg class="phase-emblem phase-emblem--jones-law" viewBox="0 0 80 56" aria-hidden="true">
+              <path d="M6 22 25 8l19 14H6zm5 3h28M14 26v14m10-14v14m10-14v14M8 42h32" fill="none" stroke="#f1d176" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path>
+              <g class="phase-three-scroll">
+                <path d="M44 11h29v34H44z" fill="#f3dfb2" stroke="#fff0a7" stroke-width="2"></path>
+                <path d="M49 18h19m-19 6h19m-19 6h14" stroke="#805b32" stroke-linecap="round" stroke-width="2"></path>
+                <circle class="phase-three-seal" cx="64" cy="37" r="5" fill="#a8493b" stroke="#f1d176" stroke-width="1.5"></circle>
+              </g>
+            </svg>
+            <span>Phase 3: False Law</span>
+            <span class="route-step-caption">Jones Law · 1916</span>
+            <span class="route-step-status">Locked</span>
+          </a>
+        </li>
+      </ol>
+      <a class="complete-link" href="lobby.html">
+        <svg class="treasure-chest" viewBox="0 0 80 56" aria-hidden="true">
+          <circle cx="18" cy="12" r="5" fill="#f8d96f" stroke="#9c6722" stroke-width="2"></circle>
+          <circle cx="62" cy="10" r="4" fill="#f8d96f" stroke="#9c6722" stroke-width="2"></circle>
+          <path d="M13 21a27 17 0 0 1 54 0v5H13z" fill="#b87936" stroke="#f1d176" stroke-width="3"></path>
+          <path d="M10 26h60v22H10z" fill="#75431f" stroke="#f1d176" stroke-width="3"></path>
+          <path d="M20 27v20m40-20v20M10 34h60" fill="none" stroke="#d7a84c" stroke-width="4"></path>
+          <path d="M35 32h10v12H35z" fill="#f4d36f" stroke="#8b571f" stroke-width="2"></path>
+          <circle cx="40" cy="36" r="1.5" fill="#70421d"></circle>
+        </svg>
+        <span>Complete Quest</span>
+      </a>
+      </nav>
+      <div class="map-controls">
+        <button class="reset-progress" type="button" disabled>Reset America Progress</button>
+        <p class="progress-message" aria-live="polite">Complete each phase to unlock the next one.</p>
+      </div>
+      <div class="america-landscape" role="img" aria-label="A bald eagle flies over an American mountain range.">
+        <svg class="landscape-mountains" viewBox="0 0 460 104" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M0 70 46 34 79 63 137 15 187 70 224 39 277 78 331 19 382 67 421 37 460 70v34H0z" fill="#87927c"></path>
+          <path d="m117 32 20-17 19 21-16-8-7 7-7-8zm194 5 20-18 19 24-16-9-6 7-7-8z" fill="#eee7d4" opacity=".8"></path>
+          <path d="M0 82 66 57l54 23 70-35 62 38 71-29 65 25 72-30v55H0z" fill="#53664b"></path>
+          <path d="M0 94h460" stroke="#d3bd85" stroke-width="3" opacity=".8"></path>
+        </svg>
+        <svg class="eagle-flight" viewBox="0 0 100 60" aria-hidden="true">
+          <path class="eagle-wing" d="M49 27 7 11l19 17-17 3 39 9z" fill="#3d382f"></path>
+          <path class="eagle-wing" d="m51 27 42-16-19 17 17 3-39 9z" fill="#3d382f"></path>
+          <path d="M41 25c7-5 15-6 22-2l10 5-10 4-6 8-8-7-10 1z" fill="#3d382f"></path>
+          <path d="M67 24c6-4 12-3 15 1l-9 4z" fill="#f1d176"></path>
+          <circle cx="70" cy="25" r="1.2" fill="#fff3d4"></circle>
+          <path d="m43 32-10 8 13-3" fill="#3d382f"></path>
+        </svg>
+      </div>
+    </div>
+  </main>
+  <script>
+    const phaseIds = ["1", "2", "3"];
+    const phaseKey = (phaseId) => `historyrunnn.america.phase.${phaseId}`;
+    const questKey = "historyrunnn.quest.america";
+    const isPhaseComplete = (phaseId) => localStorage.getItem(phaseKey(phaseId)) === "finished";
+    const progressMessage = document.querySelector(".progress-message");
+
+    const updateProgress = () => {
+      document.querySelectorAll(".route-step").forEach((step, index) => {
+        const phaseId = phaseIds[index];
+        const isComplete = isPhaseComplete(phaseId);
+        const isUnlocked = index === 0 || isPhaseComplete(phaseIds[index - 1]);
+        const link = step.querySelector(".route-step-link");
+        const status = step.querySelector(".route-step-status");
+
+        step.classList.toggle("is-complete", isComplete);
+        step.classList.toggle("is-locked", !isUnlocked);
+        status.textContent = isComplete ? "✓ Complete" : isUnlocked ? "Not complete" : "Locked";
+        link.dataset.unlocked = String(isUnlocked);
+        link.setAttribute("aria-disabled", String(!isUnlocked));
+        if (!isUnlocked) {
+          link.setAttribute("aria-label", `Phase ${phaseId}, locked. Complete Phase ${index} first.`);
+        } else {
+          link.removeAttribute("aria-label");
+        }
+      });
+
+      const allPhasesComplete = phaseIds.every(isPhaseComplete);
+      if (allPhasesComplete) {
+        localStorage.setItem(questKey, "finished");
+      } else {
+        localStorage.removeItem(questKey);
+      }
+
+      const completeLink = document.querySelector(".complete-link");
+      completeLink.classList.toggle("is-locked", !allPhasesComplete);
+      completeLink.dataset.unlocked = String(allPhasesComplete);
+      completeLink.setAttribute("aria-disabled", String(!allPhasesComplete));
+      completeLink.querySelector("span").textContent = allPhasesComplete ? "Quest Complete!" : "Complete Quest";
+      document.querySelector(".reset-progress").disabled = !phaseIds.some(isPhaseComplete);
+    };
+
+    document.querySelectorAll(".route-step-link, .complete-link").forEach((link) => {
+      link.addEventListener("click", (event) => {
+        if (link.dataset.unlocked !== "true") {
+          event.preventDefault();
+          const step = link.closest(".route-step");
+          if (step) {
+            const phaseNumber = Array.prototype.indexOf.call(document.querySelectorAll(".route-step"), step) + 1;
+            progressMessage.textContent = `Complete Phase ${phaseNumber - 1} to unlock Phase ${phaseNumber}.`;
+          } else {
+            progressMessage.textContent = "Complete all three phases to finish the America Quest.";
+          }
+        }
+      });
+    });
+
+    document.querySelector(".reset-progress").addEventListener("click", () => {
+      if (!window.confirm("Reset all America phase progress?")) {
+        return;
+      }
+
+      phaseIds.forEach((phaseId) => localStorage.removeItem(phaseKey(phaseId)));
+      updateProgress();
+      progressMessage.textContent = "America progress has been reset. Complete Phase 1 to begin.";
+    });
+
+    updateProgress();
+  </script>
+  <script src="site-audio.js" defer></script>
+</body>
+</html>

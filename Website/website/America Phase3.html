@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#493722">
+  <title>HistoryRunnn | America Phase 3</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: #493722;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .background {
+      position: fixed;
+      z-index: -1;
+      inset: 0;
+    }
+
+    .background img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .background::after {
+      position: absolute;
+      inset: 0;
+      background: rgb(36 27 17 / 52%);
+      content: "";
+    }
+
+    main {
+      display: grid;
+      min-height: 100vh;
+      min-height: 100svh;
+      place-items: center;
+      padding: clamp(16px, 4vw, 36px);
+    }
+
+    .phase-board {
+      width: min(100%, 900px);
+      padding: clamp(22px, 5vw, 52px);
+      background:
+        radial-gradient(ellipse at 12% 18%, rgb(128 86 43 / 12%), transparent 26%),
+        repeating-linear-gradient(1deg, rgb(121 82 40 / 4%) 0 1px, transparent 1px 6px),
+        linear-gradient(135deg, #f7e8c7, #dbbd85);
+      border: clamp(8px, 1.5vw, 16px) ridge #805b32;
+      border-radius: 12px;
+      box-shadow: 0 18px 60px rgb(25 18 10 / 55%), inset 0 0 0 3px rgb(255 246 221 / 55%);
+    }
+
+    .phase-content[hidden],
+    .phase-locked[hidden] {
+      display: none;
+    }
+
+    .phase-locked {
+      padding: clamp(18px, 5vw, 32px);
+      background: rgb(255 249 228 / 65%);
+      border: 2px dashed #805b32;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .phase-locked h1 {
+      margin: 0 0 16px;
+      color: #5f4225;
+      font-size: clamp(2rem, 8vw, 3rem);
+      font-variant: small-caps;
+    }
+
+    .phase-locked p {
+      line-height: 1.6;
+    }
+
+    .phase-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 16px;
+      padding: 8px 13px;
+      color: #fff3d4;
+      background: linear-gradient(135deg, #365775, #1d3448);
+      border: 2px solid #dfb873;
+      border-radius: 999px;
+      box-shadow: 0 3px 8px rgb(20 10 14 / 30%);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .phase-kicker svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    h1 {
+      margin: 0;
+      color: #5f4225;
+      font-size: clamp(1.9rem, 5.5vw, 3.2rem);
+      font-variant: small-caps;
+      line-height: 1.12;
+      text-shadow: 0 1px 0 rgb(255 248 230 / 70%);
+    }
+
+    .phase-subtitle {
+      margin: 8px 0 0;
+      color: #536e5c;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .phase-intro {
+      max-width: 760px;
+      margin: 14px 0 22px;
+      font-size: 1.05rem;
+      line-height: 1.65;
+    }
+
+    .legislature-scene {
+      height: clamp(140px, 24vw, 190px);
+      margin: 0 0 26px;
+      overflow: hidden;
+      background: #d6dfcd;
+      border: 3px solid #805b32;
+      border-radius: 8px;
+      box-shadow: inset 0 0 0 3px rgb(255 248 230 / 35%), 0 5px 12px rgb(63 45 26 / 18%);
+    }
+
+    .legislature-scene svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .law-scroll {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: document-settle 3.4s ease-in-out infinite;
+    }
+
+    .law-seal {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: seal-pulse 2.8s ease-in-out infinite;
+    }
+
+    @keyframes document-settle {
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-3px);
+      }
+    }
+
+    @keyframes seal-pulse {
+      0%,
+      100% {
+        opacity: 0.82;
+        transform: scale(0.96);
+      }
+
+      50% {
+        opacity: 1;
+        transform: scale(1.04);
+      }
+    }
+
+    .events-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0 0 14px;
+      color: #365775;
+      font-size: 1.05rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .events-title::after {
+      height: 1px;
+      flex: 1;
+      background: rgb(54 87 117 / 28%);
+      content: "";
+    }
+
+    .event-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin: 0 0 26px;
+      padding: 0;
+      list-style: none;
+      counter-reset: lesson;
+    }
+
+    .event-item {
+      display: grid;
+      grid-template-columns: 32px minmax(0, 1fr);
+      align-content: start;
+      column-gap: 12px;
+      min-height: 146px;
+      padding: 15px;
+      background: rgb(255 249 228 / 68%);
+      border-left: 4px solid #365775;
+      box-shadow: inset 0 0 0 1px rgb(122 83 40 / 16%);
+    }
+
+    .event-item::before {
+      grid-column: 1;
+      grid-row: 1 / span 3;
+      display: grid;
+      width: 30px;
+      height: 30px;
+      place-items: center;
+      color: #fff3d4;
+      background: #365775;
+      border-radius: 50%;
+      content: counter(lesson);
+      counter-increment: lesson;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .event-date,
+    .event-item h2,
+    .event-item p {
+      grid-column: 2;
+    }
+
+    .event-date {
+      color: #536e5c;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      line-height: 1.4;
+      text-transform: uppercase;
+    }
+
+    .event-item h2 {
+      margin: 0 0 5px;
+      color: #674723;
+      font-size: 1.05rem;
+    }
+
+    .event-item p {
+      margin: 0;
+      font-size: 0.98rem;
+      line-height: 1.55;
+    }
+
+    .phase-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .complete-phase,
+    .return-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-height: 46px;
+      padding: 12px 20px;
+      border: 1px solid #a17a4a;
+      border-radius: 6px;
+      font: 600 1rem Georgia, "Times New Roman", serif;
+      text-decoration: none;
+    }
+
+    .complete-phase {
+      color: #493722;
+      background: #f3dfb2;
+      cursor: pointer;
+    }
+
+    .complete-phase:disabled {
+      color: #fff3d4;
+      background: #557044;
+      border-color: #78905c;
+      cursor: default;
+    }
+
+    .return-link {
+      color: #fff3d4;
+      background: linear-gradient(180deg, #805a2e, #55391d);
+      border-color: #cba66a;
+      box-shadow: 0 4px 10px rgb(37 25 12 / 25%);
+    }
+
+    .complete-phase:focus-visible,
+    .return-link:focus-visible {
+      outline: 2px solid #f0cd88;
+      outline-offset: 3px;
+    }
+
+    .phase-status {
+      flex-basis: 100%;
+      margin: 0;
+      color: #674723;
+      font-weight: 700;
+    }
+
+    @media (max-width: 560px) {
+      .event-list {
+        grid-template-columns: 1fr;
+      }
+
+      .event-item {
+        min-height: 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .law-scroll,
+      .law-seal {
+        animation: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="background">
+    <img src="us backround.jpg" alt="">
+  </div>
+  <main>
+    <article class="phase-board">
+      <section class="phase-locked">
+        <p class="phase-label">America Quest</p>
+        <h1>Phase 3 is Locked</h1>
+        <p>Complete Phase 2 before you can continue to Phase 3.</p>
+        <a class="return-link" href="america.html">Return to America Map</a>
+      </section>
+      <div class="phase-content" hidden>
+        <header>
+          <div class="phase-kicker">
+            <svg viewBox="0 0 40 40" aria-hidden="true">
+              <path d="M5 13h30L20 5zM8 15h24M10 15v15m7-15v15m6-15v15m7-15v15M6 32h28" fill="none" stroke="#f1d176" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+            </svg>
+            <span>America Quest · Phase 3</span>
+          </div>
+          <h1>Quest: The Promise of Independence (1916)</h1>
+          <p class="phase-subtitle">The Jones Law · Philippine Autonomy Act</p>
+        </header>
+        <p class="phase-intro">
+          As Filipino leaders push for greater autonomy, the United States passes the Jones Law (Philippine Autonomy Act), formally pledging to grant full independence once a stable government is established.
+        </p>
+        <div class="legislature-scene" role="img" aria-label="The Philippine legislature beneath a government building, beside a copy of the Jones Law bearing a seal.">
+          <svg viewBox="0 0 760 190" aria-hidden="true">
+            <rect width="760" height="190" fill="#d6dfcd"></rect>
+            <path d="M0 151h760v39H0z" fill="#806443"></path>
+            <path d="M0 159h760M42 162v28m84-28v28m84-28v28m84-28v28m84-28v28m84-28v28m84-28v28m84-28v28m84-28v28" stroke="#b48b58" stroke-width="2" opacity=".55"></path>
+            <path d="M54 85 260 19l206 66z" fill="#365775" stroke="#76532f" stroke-width="5"></path>
+            <path d="M80 89h360v57H80z" fill="#eee2c3" stroke="#76532f" stroke-width="5"></path>
+            <path d="M112 92v49m58-49v49m58-49v49m58-49v49m58-49v49m58-49v49" stroke="#805b32" stroke-width="12"></path>
+            <path d="M65 148h390l-14 10H80z" fill="#805b32"></path>
+            <path d="M126 45h268" stroke="#f3e7c7" stroke-width="3" opacity=".72"></path>
+            <text x="260" y="71" fill="#fff3d4" font-family="Georgia, serif" font-size="16" font-weight="700" letter-spacing="2" text-anchor="middle">LEGISLATURE</text>
+            <g class="law-scroll">
+              <path d="M485 36h188v111H485z" fill="#f7e8c7" stroke="#805b32" stroke-width="4"></path>
+              <path d="M480 35c0-7 5-11 11-11h176c6 0 11 4 11 11s-5 10-11 10H491c-6 0-11-3-11-10zm0 112c0-7 5-11 11-11h176c6 0 11 4 11 11s-5 10-11 10H491c-6 0-11-3-11-10z" fill="#dfc38d" stroke="#805b32" stroke-width="3"></path>
+              <text x="575" y="70" fill="#674723" font-family="Georgia, serif" font-size="15" font-weight="700" text-anchor="middle">JONES LAW</text>
+              <text x="575" y="91" fill="#536e5c" font-family="Georgia, serif" font-size="13" font-weight="700" text-anchor="middle">1916</text>
+              <path d="M514 103h122m-122 9h84" stroke="#a98a5d" stroke-linecap="round" stroke-width="2"></path>
+              <circle class="law-seal" cx="643" cy="112" r="13" fill="#a8493b" stroke="#f1d176" stroke-width="2"></circle>
+              <path d="m643 104 2 6 6 1-5 4 1 6-4-3-5 3 1-6-4-4 6-1z" fill="#f1d176"></path>
+            </g>
+          </svg>
+        </div>
+        <h2 class="events-title">A promise with conditions</h2>
+        <ol class="event-list">
+          <li class="event-item">
+            <span class="event-date">Jones Law · 1916</span>
+            <h2>The Bicameral Legislature</h2>
+            <p>The American-dominated Philippine Commission is replaced by an all-Filipino legislature with an elected Senate and House of Representatives.</p>
+          </li>
+          <li class="event-item">
+            <span class="event-date">Manuel L. Quezon</span>
+            <h2>A National Hero's Return</h2>
+            <p>After championing the bill in Washington as Resident Commissioner, Quezon returns to Manila and becomes the first President of the Philippine Senate.</p>
+          </li>
+          <li class="event-item">
+            <span class="event-date">Executive Authority</span>
+            <h2>Power Still Held by the U.S.</h2>
+            <p>Filipinos gain control of the legislature, but executive authority remains with an American Governor-General appointed by the U.S. President.</p>
+          </li>
+          <li class="event-item">
+            <span class="event-date">Conditional Pledge</span>
+            <h2>Independence Promised</h2>
+            <p>For the first time in official U.S. law, the preamble promises Philippine sovereignty once a stable government is established, but sets no exact timeline.</p>
+          </li>
+        </ol>
+        <div class="phase-actions">
+          <button class="complete-phase" type="button">Mark Phase Complete</button>
+          <a class="return-link" href="america.html">
+            <span aria-hidden="true">←</span>
+            <span>Return to America Map</span>
+          </a>
+          <p class="phase-status" aria-live="polite"></p>
+        </div>
+      </div>
+    </article>
+  </main>
+  <script>
+    const prerequisiteKey = "historyrunnn.america.phase.2";
+    const phaseKey = "historyrunnn.america.phase.3";
+    const phaseContent = document.querySelector(".phase-content");
+    const lockedMessage = document.querySelector(".phase-locked");
+
+    if (localStorage.getItem(prerequisiteKey) === "finished") {
+      lockedMessage.hidden = true;
+      phaseContent.hidden = false;
+    }
+
+    const phaseButton = document.querySelector(".complete-phase");
+    const phaseStatus = document.querySelector(".phase-status");
+    const showCompletion = () => {
+      phaseButton.disabled = true;
+      phaseButton.textContent = "Phase Complete!";
+      phaseStatus.textContent = "America Quest complete — all three phases are finished.";
+    };
+
+    if (!phaseContent.hidden && localStorage.getItem(phaseKey) === "finished") {
+      showCompletion();
+    }
+
+    phaseButton.addEventListener("click", () => {
+      if (phaseContent.hidden) {
+        return;
+      }
+
+      localStorage.setItem(phaseKey, "finished");
+      const allPhasesComplete = ["1", "2", "3"].every((id) =>
+        localStorage.getItem(`historyrunnn.america.phase.${id}`) === "finished"
+      );
+      if (allPhasesComplete) {
+        localStorage.setItem("historyrunnn.quest.america", "finished");
+      } else {
+        localStorage.removeItem("historyrunnn.quest.america");
+      }
+      showCompletion();
+    });
+  </script>
+  <script src="site-audio.js" defer></script>
+</body>
+</html>

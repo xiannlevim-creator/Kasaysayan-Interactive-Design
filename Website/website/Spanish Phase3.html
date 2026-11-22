@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#493722">
+  <title>HistoryRunnn | Spanish Phase 3</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { min-height: 100vh; margin: 0; color: #493722; font-family: Georgia, "Times New Roman", serif; }
+    .background { position: fixed; z-index: -1; inset: 0; }
+    .background img { width: 100%; height: 100%; object-fit: cover; }
+    .background::after { position: absolute; inset: 0; background: rgb(36 27 17 / 52%); content: ""; }
+    main { display: grid; min-height: 100vh; min-height: 100svh; place-items: center; padding: clamp(16px, 4vw, 36px); }
+    .phase-board {
+      width: min(100%, 900px);
+      padding: clamp(22px, 5vw, 52px);
+      background: radial-gradient(ellipse at 12% 18%, rgb(128 86 43 / 12%), transparent 26%), repeating-linear-gradient(1deg, rgb(121 82 40 / 4%) 0 1px, transparent 1px 6px), linear-gradient(135deg, #f7e8c7, #dbbd85);
+      border: clamp(8px, 1.5vw, 16px) ridge #805b32;
+      border-radius: 12px;
+      box-shadow: 0 18px 60px rgb(25 18 10 / 55%), inset 0 0 0 3px rgb(255 246 221 / 55%);
+    }
+    .phase-content[hidden], .phase-locked[hidden] { display: none; }
+    .phase-locked { padding: clamp(18px, 5vw, 32px); background: rgb(255 249 228 / 65%); border: 2px dashed #805b32; border-radius: 8px; text-align: center; }
+    .phase-locked h1 { margin: 0 0 16px; color: #5f4225; font-size: clamp(2rem, 8vw, 3rem); font-variant: small-caps; }
+    .phase-locked p { line-height: 1.6; }
+    .phase-kicker { display: inline-flex; align-items: center; gap: 9px; margin-bottom: 16px; padding: 8px 13px; color: #fff3d4; background: linear-gradient(135deg, #536345, #293b30); border: 2px solid #dfb873; border-radius: 999px; box-shadow: 0 3px 8px rgb(20 10 14 / 30%); font-size: .75rem; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
+    .phase-kicker svg { width: 22px; height: 22px; }
+    h1 { margin: 0; color: #5f4225; font-size: clamp(1.9rem, 5.5vw, 3.2rem); font-variant: small-caps; line-height: 1.12; }
+    .phase-subtitle { margin: 8px 0 0; color: #536e5c; font-size: .82rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; }
+    .phase-intro { max-width: 760px; margin: 14px 0 22px; font-size: 1.05rem; line-height: 1.65; }
+    .phase-scene { height: clamp(140px, 24vw, 190px); margin: 0 0 26px; overflow: hidden; background: linear-gradient(180deg, #d6dfcd 0 72%, #92764f 73% 100%); border: 3px solid #805b32; border-radius: 8px; box-shadow: inset 0 0 0 3px rgb(255 248 230 / 35%), 0 5px 12px rgb(63 45 26 / 18%); }
+    .phase-scene svg { display: block; width: 100%; height: 100%; }
+    .revolution-flag { transform-box: fill-box; transform-origin: left center; animation: flag-wave 1.8s ease-in-out infinite alternate; }
+    .revolution-sun { transform-box: fill-box; transform-origin: center; animation: sun-rise 3s ease-in-out infinite; }
+    @keyframes flag-wave { to { transform: skewY(-4deg); } }
+    @keyframes sun-rise { 0%, 100% { opacity: .7; transform: scale(.94); } 50% { opacity: 1; transform: scale(1.05); } }
+    .events-title { display: flex; align-items: center; gap: 12px; margin: 0 0 14px; color: #365775; font-size: 1.05rem; letter-spacing: .08em; text-transform: uppercase; }
+    .events-title::after { height: 1px; flex: 1; background: rgb(54 87 117 / 28%); content: ""; }
+    .event-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0 0 26px; padding: 0; list-style: none; counter-reset: event; }
+    .event-item { display: grid; grid-template-columns: 32px minmax(0, 1fr); align-content: start; column-gap: 12px; min-height: 146px; padding: 15px; background: rgb(255 249 228 / 68%); border-left: 4px solid #536345; box-shadow: inset 0 0 0 1px rgb(122 83 40 / 16%); }
+    .event-item::before { grid-column: 1; grid-row: 1 / span 3; display: grid; width: 30px; height: 30px; place-items: center; color: #fff3d4; background: #536345; border-radius: 50%; content: counter(event); counter-increment: event; font-size: .8rem; font-weight: 700; }
+    .event-date, .event-item h2, .event-item p { grid-column: 2; }
+    .event-date { color: #536e5c; font-size: .82rem; font-weight: 700; letter-spacing: .06em; line-height: 1.4; text-transform: uppercase; }
+    .event-item h2 { margin: 0 0 5px; color: #674723; font-size: 1.05rem; }
+    .event-item p { margin: 0; font-size: .98rem; line-height: 1.55; }
+    .phase-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+    .complete-phase, .return-link { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 46px; padding: 12px 20px; border: 1px solid #a17a4a; border-radius: 6px; font: 600 1rem Georgia, "Times New Roman", serif; text-decoration: none; }
+    .complete-phase { color: #493722; background: #f3dfb2; cursor: pointer; }
+    .complete-phase:disabled { color: #fff3d4; background: #557044; border-color: #78905c; cursor: default; }
+    .return-link { color: #fff3d4; background: linear-gradient(180deg, #805a2e, #55391d); border-color: #cba66a; box-shadow: 0 4px 10px rgb(37 25 12 / 25%); }
+    .complete-phase:focus-visible, .return-link:focus-visible { outline: 2px solid #f0cd88; outline-offset: 3px; }
+    .phase-status { flex-basis: 100%; margin: 0; color: #674723; font-weight: 700; }
+    @media (max-width: 560px) { .event-list { grid-template-columns: 1fr; } .event-item { min-height: 0; } }
+    @media (prefers-reduced-motion: reduce) { .revolution-flag, .revolution-sun { animation: none; } }
+  </style>
+</head>
+<body>
+  <div class="background"><img src="Spain backround.jpg" alt=""></div>
+  <main>
+    <article class="phase-board">
+      <section class="phase-locked">
+        <p>Spanish Quest</p>
+        <h1>Phase 3 is Locked</h1>
+        <p>Complete Phase 2 before you can continue to Phase 3.</p>
+        <a class="return-link" href="spanish.html">Return to Spanish Map</a>
+      </section>
+      <div class="phase-content" hidden>
+        <header>
+          <div class="phase-kicker">
+            <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M6 32h28M9 29l11-19 11 19M20 10v19m-6-10h12" fill="none" stroke="#f1d176" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path></svg>
+            <span>Spanish Quest · Phase 3</span>
+          </div>
+          <h1>Quest: The Spark of Revolution (1896)</h1>
+          <p class="phase-subtitle">The Katipunan · Philippine Revolution</p>
+        </header>
+        <p class="phase-intro">After over three centuries of colonial rule, forced labor, and execution of reformists, the secret society <em>Katipunan</em> launches an armed uprising for Philippine independence.</p>
+        <div class="phase-scene" role="img" aria-label="A Katipunan flag rises above torn cedulas as the revolution begins.">
+          <svg viewBox="0 0 760 190" aria-hidden="true">
+            <rect width="760" height="190" fill="#d6dfcd"></rect>
+            <path d="M0 145h760v45H0z" fill="#806443"></path>
+            <path d="M0 154h760M45 157v33m90-33v33m90-33v33m90-33v33m90-33v33m90-33v33m90-33v33m90-33v33" stroke="#b48b58" stroke-width="2" opacity=".55"></path>
+            <path d="M43 144V84h173v60M33 84l96-58 96 58" fill="#a88a5e" stroke="#805b32" stroke-width="5"></path>
+            <path d="M76 104h33v40H76zm71 0h33v40h-33z" fill="#493722"></path>
+            <path d="M425 150V24" stroke="#70421d" stroke-linecap="round" stroke-width="8"></path>
+            <path class="revolution-flag" d="M432 29h213l-18 25 18 25H432z" fill="#a8493b" stroke="#f1d176" stroke-width="3"></path>
+            <circle class="revolution-sun" cx="477" cy="54" r="13" fill="#f1d176"></circle>
+            <path d="m477 34 4 12 12 4-12 4-4 12-4-12-12-4 12-4z" fill="#fff3d4"></path>
+            <path d="m250 152 58-19 20 10-49 23zm88 8 40-20 24 11-35 22zm68-6 28-13 18 10-29 17z" fill="#f3dfb2" stroke="#805b32" stroke-width="2"></path>
+            <path d="m257 153 13-7m82 10 10-5m68-5 8-4" stroke="#a8493b" stroke-width="2"></path>
+          </svg>
+        </div>
+        <h2 class="events-title">Key Events</h2>
+        <ol class="event-list">
+          <li class="event-item"><span class="event-date">August 19, 1896</span><h2>Discovery of the Katipunan</h2><p>Spanish authorities uncover the secret revolutionary society, forcing its <em>Supremo</em>, Andres Bonifacio, to accelerate plans for revolt.</p></li>
+          <li class="event-item"><span class="event-date">Late August 1896</span><h2>Cry of Pugad Lawin</h2><p>Bonifacio gathers Katipuneros in Caloocan, where they tear up their <em>cedulas</em> (tax certificates) to signal the start of the revolution.</p></li>
+          <li class="event-item"><span class="event-date">August 30, 1896</span><h2>Battle of Pinaglabanan</h2><p>Katipuneros attack a Spanish powder magazine in San Juan del Monte, prompting Governor-General Ramón Blanco to declare martial law across eight provinces.</p></li>
+          <li class="event-item"><span class="event-date">December 30, 1896</span><h2>Martyrdom at Bagumbayan</h2><p>Spanish authorities execute reformist writer José Rizal by firing squad, further uniting and radicalizing Filipinos against Spain.</p></li>
+        </ol>
+        <div class="phase-actions">
+          <button class="complete-phase" type="button">Mark Phase Complete</button>
+          <a class="return-link" href="spanish.html">Return to Spanish Map</a>
+          <p class="phase-status" aria-live="polite"></p>
+        </div>
+      </div>
+    </article>
+  </main>
+  <script>
+    const prerequisiteKey = "historyrunnn.spanish.phase.2";
+    const phaseKey = "historyrunnn.spanish.phase.3";
+    const phaseContent = document.querySelector(".phase-content");
+    const lockedMessage = document.querySelector(".phase-locked");
+
+    if (localStorage.getItem(prerequisiteKey) === "finished") {
+      lockedMessage.hidden = true;
+      phaseContent.hidden = false;
+    }
+
+    const phaseButton = document.querySelector(".complete-phase");
+    const phaseStatus = document.querySelector(".phase-status");
+    const showCompletion = () => {
+      phaseButton.disabled = true;
+      phaseButton.textContent = "Phase Complete!";
+      phaseStatus.textContent = "All three Spanish phases complete — the Spanish Quest is finished.";
+    };
+
+    if (!phaseContent.hidden && localStorage.getItem(phaseKey) === "finished") showCompletion();
+
+    phaseButton.addEventListener("click", () => {
+      if (phaseContent.hidden) return;
+      localStorage.setItem(phaseKey, "finished");
+      const allPhasesComplete = ["1", "2", "3"].every((id) =>
+        localStorage.getItem(`historyrunnn.spanish.phase.${id}`) === "finished"
+      );
+      if (allPhasesComplete) localStorage.setItem("historyrunnn.quest.spanish", "finished");
+      else localStorage.removeItem("historyrunnn.quest.spanish");
+      showCompletion();
+    });
+  </script>
+  <script src="site-audio.js" defer></script>
+</body>
+</html>

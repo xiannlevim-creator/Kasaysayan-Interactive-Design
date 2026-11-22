@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#493722">
+  <title>HistoryRunnn | Your Reward</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: #493722;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .background {
+      position: fixed;
+      z-index: -1;
+      inset: 0;
+    }
+
+    .background img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .background::after {
+      position: absolute;
+      inset: 0;
+      background: rgb(36 27 17 / 55%);
+      content: "";
+    }
+
+    main {
+      display: grid;
+      min-height: 100vh;
+      min-height: 100svh;
+      place-items: center;
+      padding: clamp(16px, 4vw, 36px);
+    }
+
+    .certificate,
+    .locked-message {
+      width: min(100%, 860px);
+      padding: clamp(24px, 6vw, 58px);
+      background:
+        radial-gradient(ellipse at 12% 18%, rgb(128 86 43 / 12%), transparent 26%),
+        radial-gradient(ellipse at 88% 82%, rgb(128 86 43 / 10%), transparent 24%),
+        repeating-linear-gradient(1deg, rgb(121 82 40 / 4%) 0 1px, transparent 1px 6px),
+        linear-gradient(135deg, #fff2d5, #dfc28b);
+      border: clamp(8px, 1.5vw, 16px) ridge #805b32;
+      border-radius: 12px;
+      box-shadow: 0 22px 70px rgb(22 16 8 / 55%), inset 0 0 0 3px rgb(255 248 230 / 70%);
+      text-align: center;
+    }
+
+    .certificate[hidden],
+    .locked-message[hidden] {
+      display: none;
+    }
+
+    .locked-message {
+      width: min(100%, 620px);
+      background: linear-gradient(135deg, #f7e8c7, #dbbd85);
+    }
+
+    .locked-message h1,
+    .award-title {
+      margin: 0;
+      color: #5f4225;
+      font-size: clamp(2rem, 6vw, 3.4rem);
+      font-variant: small-caps;
+      line-height: 1.12;
+    }
+
+    .locked-message p {
+      margin: 16px 0 22px;
+      line-height: 1.6;
+    }
+
+    .certificate-kicker {
+      margin: 0 0 10px;
+      color: #78602f;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .medal {
+      width: clamp(110px, 20vw, 150px);
+      margin: 0 auto 14px;
+      filter: drop-shadow(0 8px 8px rgb(84 55 18 / 25%));
+      animation: medal-rise 900ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+
+    .medal svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    @keyframes medal-rise {
+      from {
+        opacity: 0;
+        transform: translateY(18px) scale(0.86);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .award-subtitle {
+      margin: 12px 0 22px;
+      color: #536e5c;
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .recipient-name {
+      margin: -8px 0 22px;
+      color: #5f4225;
+      font-size: clamp(1.4rem, 4vw, 2rem);
+      font-weight: 700;
+    }
+
+    .award-copy {
+      width: min(100%, 640px);
+      margin: 0 auto 26px;
+      font-size: 1.08rem;
+      line-height: 1.7;
+    }
+
+    .quest-awards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin: 0 0 28px;
+    }
+
+    .quest-award {
+      padding: 15px 10px;
+      background: rgb(255 249 228 / 72%);
+      border: 1px solid rgb(128 91 50 / 38%);
+      border-radius: 7px;
+      box-shadow: inset 0 0 0 2px rgb(255 248 230 / 38%);
+    }
+
+    .quest-award span {
+      display: block;
+      color: #5f4225;
+      font-weight: 700;
+    }
+
+    .quest-award strong {
+      display: block;
+      margin-top: 6px;
+      color: #6a8053;
+      font-size: 0.74rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .certificate-rule {
+      width: min(100%, 460px);
+      height: 1px;
+      margin: 0 auto 24px;
+      background: linear-gradient(90deg, transparent, #9e7946, transparent);
+    }
+
+    .award-message {
+      margin: 0 0 25px;
+      color: #76572f;
+      font-style: italic;
+    }
+
+    .reward-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .reward-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 12px 20px;
+      color: #fff3d4;
+      background: linear-gradient(180deg, #805a2e, #55391d);
+      border: 1px solid #cba66a;
+      border-radius: 6px;
+      box-shadow: 0 4px 10px rgb(37 25 12 / 25%);
+      font: 600 1rem Georgia, "Times New Roman", serif;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .reward-action--secondary {
+      color: #674723;
+      background: rgb(255 249 228 / 82%);
+      border-color: #a17a4a;
+    }
+
+    .reward-action:focus-visible {
+      outline: 3px solid #f0cd88;
+      outline-offset: 3px;
+    }
+
+    .easter-egg-dialog {
+      width: min(92vw, 680px);
+      max-width: none;
+      max-height: 90vh;
+      padding: clamp(20px, 5vw, 32px);
+      color: #493722;
+      background: linear-gradient(135deg, #fff2d5, #dfc28b);
+      border: 8px ridge #805b32;
+      border-radius: 12px;
+      box-shadow: 0 22px 70px rgb(22 16 8 / 55%);
+    }
+
+    .easter-egg-dialog::backdrop {
+      background: rgb(20 15 10 / 78%);
+      backdrop-filter: blur(3px);
+    }
+
+    .easter-egg-dialog h2 {
+      margin: 0 0 12px;
+      color: #5f4225;
+      font-size: clamp(1.5rem, 5vw, 2rem);
+      font-variant: small-caps;
+    }
+
+    .easter-egg-dialog p {
+      line-height: 1.6;
+    }
+
+    .easter-egg-dialog-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .easter-egg-video {
+      display: block;
+      width: 100%;
+      max-height: 68vh;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      border: 2px solid #805b32;
+      border-radius: 6px;
+    }
+
+    .video-status {
+      min-height: 1.5em;
+      margin: 10px 0;
+      color: #674723;
+      font-weight: 600;
+    }
+
+    @media (max-width: 560px) {
+      .quest-awards {
+        grid-template-columns: 1fr;
+      }
+
+      .quest-award {
+        padding: 12px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .medal {
+        animation: none;
+      }
+    }
+
+    @media print {
+      body {
+        color: #493722;
+        background: #fff;
+      }
+
+      .background,
+      .reward-actions,
+      .easter-egg-dialog,
+      .site-audio-toggle {
+        display: none !important;
+      }
+
+      main {
+        display: block;
+        min-height: 0;
+        padding: 0;
+      }
+
+      .certificate {
+        width: 100%;
+        border-color: #805b32;
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="background">
+    <img src="entrance backround.jpg" alt="">
+  </div>
+  <main>
+    <section class="locked-message" aria-labelledby="locked-title" hidden>
+      <p class="certificate-kicker">Reward locked</p>
+      <h1 id="locked-title">Your quests are not finished yet</h1>
+      <p>Complete every phase in the Japan, America, and Spanish quests to earn your History Explorer certificate.</p>
+      <a class="reward-action" href="lobby.html">Return to the Lobby</a>
+    </section>
+
+    <article class="certificate" aria-labelledby="award-title" hidden>
+      <p class="certificate-kicker">HistoryRunnn Achievement</p>
+      <div class="medal" aria-hidden="true">
+        <svg viewBox="0 0 160 170">
+          <path d="m51 100-9 58 38-22 38 22-9-58" fill="#9b4936" stroke="#674723" stroke-linejoin="round" stroke-width="4"></path>
+          <circle cx="80" cy="68" r="52" fill="#d6aa48" stroke="#805b32" stroke-width="6"></circle>
+          <circle cx="80" cy="68" r="42" fill="#f3dfb2" stroke="#fff1bf" stroke-width="3"></circle>
+          <path d="M80 34 88 55l22 1-17 14 6 22-19-12-19 12 6-22-17-14 22-1z" fill="#9b4936" stroke="#805b32" stroke-linejoin="round" stroke-width="2"></path>
+          <circle cx="80" cy="68" r="8" fill="#f1d176"></circle>
+        </svg>
+      </div>
+      <h1 class="award-title" id="award-title">History Explorer</h1>
+      <p class="award-subtitle">Certificate of Achievement</p>
+      <p class="recipient-name" id="recipient-name" hidden></p>
+      <p class="award-copy">
+        Congratulations! You completed all three historical quests and explored the stories of Japan,
+        America, and Spain in the Philippines.
+      </p>
+      <div class="quest-awards" aria-label="Completed quests">
+        <div class="quest-award"><span>Japan Quest</span><strong>Complete</strong></div>
+        <div class="quest-award"><span>America Quest</span><strong>Complete</strong></div>
+        <div class="quest-award"><span>Spanish Quest</span><strong>Complete</strong></div>
+      </div>
+      <div class="certificate-rule" aria-hidden="true"></div>
+      <p class="award-message">Awarded for curiosity, persistence, and a love of history.</p>
+      <div class="reward-actions">
+        <button class="reward-action print-button" type="button">Print Certificate</button>
+        <button class="reward-action reward-action--secondary easter-egg-button" type="button" aria-label="Play jump-scare video immediately">EASTER EGG!!!!</button>
+        <a class="reward-action reward-action--secondary" href="lobby.html">Back to the Lobby</a>
+      </div>
+    </article>
+  </main>
+  <dialog class="easter-egg-dialog" aria-labelledby="easter-egg-title">
+    <h2 id="easter-egg-title">Easter Egg</h2>
+    <video class="easter-egg-video" controls playsinline preload="none" aria-label="Jump-scare video">
+      <source data-src="BLACK_SCREEN_JUMPSCARE_trimmed.webm" type="video/webm">
+      <source data-src="BLACK_SCREEN_JUMPSCARE_trimmed.mp4" type="video/mp4">
+    </video>
+    <p class="video-status" aria-live="polite"></p>
+    <div class="easter-egg-dialog-actions">
+      <button class="reward-action reward-action--secondary close-surprise-button" type="button">Close video</button>
+    </div>
+  </dialog>
+  <script>
+    const questIds = ["japan", "america", "spanish"];
+    const isQuestFinished = (questId) => {
+      if (questId === "spanish") {
+        return ["1", "2", "3"].every((phaseId) =>
+          localStorage.getItem(`historyrunnn.spanish.phase.${phaseId}`) === "finished"
+        );
+      }
+      return localStorage.getItem(`historyrunnn.quest.${questId}`) === "finished";
+    };
+    const allQuestsFinished = questIds.every(isQuestFinished);
+    const lockedMessage = document.querySelector(".locked-message");
+    const certificate = document.querySelector(".certificate");
+
+    lockedMessage.hidden = allQuestsFinished;
+    certificate.hidden = !allQuestsFinished;
+
+    if (allQuestsFinished) {
+      const playerName = localStorage.getItem("historyrunnn.player.name");
+      const recipientName = document.querySelector("#recipient-name");
+      if (playerName) {
+        recipientName.textContent = `Awarded to ${playerName}`;
+        recipientName.hidden = false;
+      }
+
+      document.querySelector(".print-button").addEventListener("click", () => {
+        window.setTimeout(() => window.print(), 100);
+      });
+
+      const easterEggDialog = document.querySelector(".easter-egg-dialog");
+      const easterEggVideo = document.querySelector(".easter-egg-video");
+      const videoStatus = document.querySelector(".video-status");
+
+      document.querySelector(".easter-egg-button").addEventListener("click", () => {
+        easterEggDialog.showModal();
+        easterEggVideo.querySelectorAll("source").forEach((source) => {
+          source.src = source.dataset.src;
+        });
+        easterEggVideo.load();
+        easterEggVideo.play().then(() => {
+          videoStatus.textContent = "Playing the Easter Egg.";
+        }).catch((error) => {
+          console.error("Could not play the Easter Egg video.", error);
+          videoStatus.textContent = "The video could not play. Check your browser’s audio and video settings.";
+        });
+      });
+
+      document.querySelector(".close-surprise-button").addEventListener("click", () => {
+        easterEggDialog.close();
+      });
+
+      easterEggVideo.addEventListener("error", () => {
+        if (!easterEggVideo.currentSrc) return;
+        console.error("Could not load the Easter Egg video.", easterEggVideo.error);
+        videoStatus.textContent = "The Easter Egg video could not load.";
+      });
+
+      easterEggVideo.addEventListener("ended", () => {
+        videoStatus.textContent = "The surprise is over. You can replay it or close this window.";
+      });
+
+      easterEggDialog.addEventListener("close", () => {
+        easterEggVideo.pause();
+        easterEggVideo.removeAttribute("src");
+        easterEggVideo.querySelectorAll("source").forEach((source) => {
+          source.removeAttribute("src");
+        });
+        easterEggVideo.load();
+        videoStatus.textContent = "";
+      });
+    }
+  </script>
+  <script src="site-audio.js" defer></script>
+</body>
+</html>

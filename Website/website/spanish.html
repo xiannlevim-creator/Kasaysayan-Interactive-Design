@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#493722">
+  <title>HistoryRunnn | Spanish Quest</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: #fff8e9;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .background {
+      position: fixed;
+      z-index: -1;
+      inset: 0;
+    }
+
+    .background img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .background::after {
+      position: absolute;
+      inset: 0;
+      background: rgb(36 27 17 / 52%);
+      content: "";
+    }
+
+    main {
+      display: grid;
+      min-height: 100vh;
+      min-height: 100svh;
+      place-items: center;
+      padding: 24px 0;
+    }
+
+    .spanish-content {
+      display: grid;
+      justify-items: center;
+      gap: 16px;
+      width: 100%;
+    }
+
+    .route-map {
+      position: relative;
+      isolation: isolate;
+      display: grid;
+      width: min(1100px, 94vw);
+      height: 320px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      align-items: center;
+      justify-items: center;
+      background:
+        radial-gradient(ellipse at 18% 72%, rgb(61 115 119 / 23%) 0 9%, transparent 10%),
+        radial-gradient(ellipse at 54% 26%, rgb(61 115 119 / 19%) 0 12%, transparent 13%),
+        radial-gradient(ellipse at 84% 78%, rgb(61 115 119 / 22%) 0 10%, transparent 11%),
+        repeating-radial-gradient(ellipse at 48% 50%, transparent 0 22px, rgb(94 119 89 / 10%) 23px 24px, transparent 25px 48px),
+        repeating-linear-gradient(3deg, rgb(103 70 35 / 5%) 0 1px, transparent 1px 6px),
+        linear-gradient(135deg, #f1e2bb, #c9ab72);
+      border: 10px ridge #76502f;
+      border-radius: 14px;
+      box-shadow: 0 16px 38px rgb(22 16 8 / 48%), inset 0 0 0 3px rgb(255 246 221 / 55%), inset 0 0 28px rgb(91 59 28 / 20%);
+    }
+
+    .route-map::before {
+      position: absolute;
+      z-index: 0;
+      inset: 8px;
+      border: 1px solid rgb(112 75 38 / 50%);
+      content: "";
+      pointer-events: none;
+    }
+
+    .route-map::after {
+      position: absolute;
+      top: 16px;
+      right: 24px;
+      z-index: 2;
+      color: #76502f;
+      content: "N  ↑";
+      font: 700 0.7rem Georgia, "Times New Roman", serif;
+      letter-spacing: 0.12em;
+      pointer-events: none;
+    }
+
+    .route-art,
+    .route-connectors {
+      position: absolute;
+      z-index: 0;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .route-connectors path {
+      fill: none;
+      stroke: #80552f;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 8;
+      stroke-dasharray: 1 18;
+      filter: drop-shadow(0 1px 2px rgb(44 27 12 / 65%));
+    }
+
+    .mobile-path {
+      display: none;
+    }
+
+    .route-steps {
+      display: contents;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .route-step,
+    .complete-link {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      width: min(190px, calc(100% - 12px));
+      min-height: 108px;
+      place-items: center;
+      padding: 9px;
+      color: #fff;
+      border: 2px solid #dfb873;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .route-step-link {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-rows: 30px auto auto auto;
+      gap: 3px;
+      width: 100%;
+      height: 100%;
+      place-items: center;
+      padding: 7px;
+      color: inherit;
+      border-radius: inherit;
+      font-size: 0.9rem;
+      font-weight: 700;
+      line-height: 1.15;
+      text-align: center;
+      text-decoration: none;
+    }
+
+    .route-step-link:focus-visible,
+    .complete-link:focus-visible,
+    .reset-progress:focus-visible {
+      outline: 3px solid #fff3d4;
+      outline-offset: 3px;
+    }
+
+    .route-step:nth-child(1) {
+      grid-column: 1;
+      align-self: end;
+      margin-bottom: 22px;
+      background: linear-gradient(180deg, #8b493b, #542c2a);
+      box-shadow: inset 0 0 0 2px rgb(255 239 217 / 15%), 0 5px 14px rgb(20 10 14 / 55%);
+    }
+
+    .route-step:nth-child(2) {
+      grid-column: 2;
+      align-self: start;
+      margin-top: 34px;
+      background: linear-gradient(180deg, #805a2e, #55391d);
+      box-shadow: inset 0 0 0 2px rgb(240 215 162 / 15%), 0 5px 14px rgb(10 20 29 / 55%);
+    }
+
+    .route-step:nth-child(3) {
+      grid-column: 3;
+      align-self: end;
+      margin-bottom: 22px;
+      background: linear-gradient(180deg, #536345, #293b30);
+      box-shadow: inset 0 0 0 2px rgb(240 215 162 / 15%), 0 5px 14px rgb(12 22 15 / 55%);
+    }
+
+    .route-step.is-complete {
+      border-color: #f1d176;
+      box-shadow: inset 0 0 0 2px rgb(240 215 162 / 30%), 0 0 16px rgb(242 209 118 / 38%), 0 5px 14px rgb(10 20 29 / 55%);
+    }
+
+    .route-step.is-locked {
+      filter: saturate(0.55);
+      opacity: 0.74;
+    }
+
+    .route-step.is-locked .route-step-link,
+    .complete-link.is-locked {
+      cursor: not-allowed;
+    }
+
+    .route-emblem {
+      width: 42px;
+      height: 30px;
+      filter: drop-shadow(0 1px 1px rgb(0 0 0 / 55%));
+    }
+
+    .route-step-caption,
+    .route-step-status {
+      color: #f0d39a;
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .phase-one-ship {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: ship-bob 2.8s ease-in-out infinite;
+    }
+
+    .phase-one-waves {
+      stroke-dasharray: 4 3;
+      animation: wave-drift 3s linear infinite;
+    }
+
+    .phase-two-sail {
+      transform-box: fill-box;
+      transform-origin: 50% 50%;
+      animation: sail-sway 3s ease-in-out infinite alternate;
+    }
+
+    .phase-three-sun {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: sun-pulse 2.8s ease-in-out infinite;
+    }
+
+    @keyframes ship-bob {
+      50% { transform: translateY(-2px); }
+    }
+
+    @keyframes wave-drift {
+      to { stroke-dashoffset: -14; }
+    }
+
+    @keyframes sail-sway {
+      to { transform: rotate(4deg); }
+    }
+
+    @keyframes sun-pulse {
+      50% { opacity: 0.65; transform: scale(0.9); }
+    }
+
+    .complete-link {
+      grid-column: 4;
+      align-self: start;
+      margin-top: 34px;
+      grid-template-rows: 38px auto;
+      gap: 4px;
+      min-height: 88px;
+      padding: 8px 12px;
+      color: #fff1bd;
+      background: linear-gradient(180deg, #805a2e, #55391d);
+      box-shadow: inset 0 0 0 2px rgb(240 215 162 / 15%), 0 5px 14px rgb(10 20 29 / 55%);
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .complete-link svg {
+      width: 38px;
+      height: 32px;
+    }
+
+    .map-controls {
+      display: grid;
+      justify-items: center;
+      gap: 8px;
+    }
+
+    .reset-progress {
+      padding: 10px 16px;
+      color: #fff3d4;
+      background: linear-gradient(180deg, #805a2e, #55391d);
+      border: 1px solid #cba66a;
+      border-radius: 6px;
+      box-shadow: 0 4px 10px rgb(37 25 12 / 25%);
+      font: 600 0.95rem Georgia, "Times New Roman", serif;
+      cursor: pointer;
+    }
+
+    .reset-progress:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .progress-message {
+      max-width: min(460px, 94vw);
+      margin: 0;
+      color: #fff3d4;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-align: center;
+      text-shadow: 0 1px 4px rgb(0 0 0 / 65%);
+    }
+
+    .spanish-landscape {
+      width: min(460px, 92vw);
+      height: 104px;
+      overflow: hidden;
+      background: linear-gradient(180deg, #b9d1cf 0 52%, #759b9b 53% 100%);
+      border: 2px solid #cba66a;
+      border-radius: 8px;
+      box-shadow: 0 6px 18px rgb(22 16 8 / 38%);
+    }
+
+    .spanish-landscape svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .landscape-ship {
+      animation: landscape-sail 12s linear infinite;
+    }
+
+    @keyframes landscape-sail {
+      to { transform: translateX(520px); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .phase-one-ship,
+      .phase-one-waves,
+      .phase-two-sail,
+      .phase-three-sun,
+      .landscape-ship {
+        animation: none;
+      }
+
+      .landscape-ship {
+        transform: translateX(190px);
+      }
+    }
+
+    @media (max-width: 600px) {
+      main {
+        padding: 20px 0;
+      }
+
+      .spanish-content {
+        gap: 12px;
+      }
+
+      .route-map {
+        width: min(360px, calc(100vw - 32px));
+        height: 600px;
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(4, 150px);
+      }
+
+      .route-connectors .desktop-path {
+        display: none;
+      }
+
+      .route-connectors .mobile-path {
+        display: block;
+      }
+
+      .route-step,
+      .complete-link {
+        grid-column: 1;
+        width: min(230px, 90%);
+        margin: 0;
+      }
+
+      .route-step:nth-child(1) {
+        grid-column: 1;
+        grid-row: 1;
+        align-self: center;
+      }
+
+      .route-step:nth-child(2) {
+        grid-column: 1;
+        grid-row: 2;
+        align-self: center;
+      }
+
+      .route-step:nth-child(3) {
+        grid-column: 1;
+        grid-row: 3;
+        align-self: center;
+      }
+
+      .complete-link {
+        grid-row: 4;
+        align-self: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="background">
+    <img src="Spain backround.jpg" alt="">
+  </div>
+  <main>
+    <div class="spanish-content">
+      <nav class="route-map" aria-label="Spanish quest route">
+        <svg class="route-art" viewBox="0 0 1000 600" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M0 276c93-37 120-81 196-60s96 70 172 42 110-75 181-42 101 68 173 51 142-78 278-38v371H0z" fill="#6c8c75" opacity=".28"></path>
+          <path d="m99 198 47-18 42 21-16 24-47 8-35-16zm207 92 36-14 40 14-9 24-42 7-30-13zm262-82 57-23 49 23-19 27-48 5-39-15zm214 99 40-19 46 16-11 25-42 10-40-14z" fill="#71865a" stroke="#99764c" stroke-width="4"></path>
+          <path d="m141 187 9-25 9 25m222 115 8-23 9 23m307-199 9-22 8 22m-80 327 8-21 8 21" fill="none" stroke="#e9ddbd" stroke-width="3" opacity=".8"></path>
+        </svg>
+        <svg class="route-connectors" viewBox="0 0 1000 600" preserveAspectRatio="none" aria-hidden="true">
+          <path class="desktop-path" d="M155 438C225 410 240 235 320 180S450 150 500 185s95 170 150 253 100-15 175-140"></path>
+          <path class="mobile-path" d="M500 75c190 0 200 75 50 75s-140 55 0 75 150 60 0 75-140 75 0 75 200 75 0 75"></path>
+        </svg>
+        <ol class="route-steps">
+          <li class="route-step">
+            <a class="route-step-link" href="Spanish Phase1.html">
+              <svg class="route-emblem" viewBox="0 0 80 56" aria-hidden="true">
+                <path class="phase-one-waves" d="M8 47c7-4 13 4 20 0s13 4 20 0 13 4 20 0" fill="none" stroke="#c3d6d7" stroke-linecap="round" stroke-width="3"></path>
+                <g class="phase-one-ship">
+                  <path d="M11 33h58L59 44H23z" fill="#a8493b" stroke="#f1d176" stroke-width="2"></path>
+                  <path d="M38 31V9m2 2 17 17H41zm-3 3L23 28h14z" fill="#f3dfb2" stroke="#fff0a7" stroke-linejoin="round" stroke-width="1.5"></path>
+                  <path d="M10 47h56" stroke="#c3d6d7" stroke-width="2"></path>
+                </g>
+              </svg>
+              <span>Phase 1: Arrival</span>
+              <span class="route-step-caption">Cross &amp; Sword · 1521</span>
+              <span class="route-step-status">Not complete</span>
+            </a>
+          </li>
+          <li class="route-step">
+            <a class="route-step-link" href="Spanish Phase2.html">
+              <svg class="route-emblem" viewBox="0 0 80 56" aria-hidden="true">
+                <path d="M8 46h64M14 42V25h48v17M10 25h56L38 8z" fill="none" stroke="#f1d176" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path>
+                <g class="phase-two-sail">
+                  <path d="M64 19V5m2 2 10 11H66z" fill="#f3dfb2" stroke="#fff0a7" stroke-linejoin="round" stroke-width="1.5"></path>
+                </g>
+                <path d="M22 30v12m12-12v12m12-12v12" stroke="#f1d176" stroke-width="3"></path>
+              </svg>
+              <span>Phase 2: Foothold</span>
+              <span class="route-step-caption">Legazpi · 1565</span>
+              <span class="route-step-status">Locked</span>
+            </a>
+          </li>
+          <li class="route-step">
+            <a class="route-step-link" href="Spanish Phase3.html">
+              <svg class="route-emblem" viewBox="0 0 80 56" aria-hidden="true">
+                <path d="M13 46h55M19 43V15h42v28M12 15h56L40 5z" fill="none" stroke="#f1d176" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path>
+                <path d="M23 23h34v15H23z" fill="#a8493b" stroke="#fff0a7" stroke-width="2"></path>
+                <circle class="phase-three-sun" cx="40" cy="30" r="6" fill="#f1d176"></circle>
+                <path d="m40 20 2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#fff3d4"></path>
+              </svg>
+              <span>Phase 3: Revolution</span>
+              <span class="route-step-caption">Katipunan · 1896</span>
+              <span class="route-step-status">Locked</span>
+            </a>
+          </li>
+        </ol>
+        <a class="complete-link is-locked" href="lobby.html" aria-disabled="true">
+          <svg viewBox="0 0 80 56" aria-hidden="true">
+            <path d="M18 45h44M22 41V16h36v25M15 16h50L40 5z" fill="none" stroke="#f1d176" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path>
+            <path d="M31 24h18v17H31z" fill="#a8493b" stroke="#f1d176" stroke-width="2"></path>
+          </svg>
+          <span>Complete Quest</span>
+        </a>
+      </nav>
+      <div class="map-controls">
+        <button class="reset-progress" type="button" disabled>Reset Spanish Progress</button>
+        <p class="progress-message" aria-live="polite">Complete each phase to unlock the next one.</p>
+      </div>
+      <div class="spanish-landscape" role="img" aria-label="A Spanish galleon sails across the Pacific toward the Philippine islands.">
+        <svg viewBox="0 0 460 104" aria-hidden="true">
+          <path d="M0 73c53-13 94-13 147 0s93 13 146 0 94-13 167 0v31H0z" fill="#56818a"></path>
+          <path d="M0 80c52-13 92 13 144 0s91-13 144 0 92 13 172 0" fill="none" stroke="#c3d6d7" stroke-width="2" opacity=".7"></path>
+          <path d="M320 69 365 37l52 32" fill="#72835c"></path>
+          <g class="landscape-ship">
+            <path d="M47 58h98l-17 20H66z" fill="#70421d" stroke="#f1d176" stroke-width="2"></path>
+            <path d="M90 56V15m3 4 34 31H94zm-6 7L59 51h25z" fill="#f3dfb2" stroke="#805b32" stroke-width="2"></path>
+            <path d="M69 56h55v-9H78z" fill="#a8493b"></path>
+            <path d="M103 15h16v8h-16z" fill="#805b32"></path>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </main>
+  <script>
+    const phaseIds = ["1", "2", "3"];
+    const phaseKey = (phaseId) => `historyrunnn.spanish.phase.${phaseId}`;
+    const questKey = "historyrunnn.quest.spanish";
+    const isPhaseComplete = (phaseId) => localStorage.getItem(phaseKey(phaseId)) === "finished";
+    const progressMessage = document.querySelector(".progress-message");
+    const completeLink = document.querySelector(".complete-link");
+    const resetButton = document.querySelector(".reset-progress");
+
+    const updateProgress = () => {
+      document.querySelectorAll(".route-step").forEach((step, index) => {
+        const phaseId = phaseIds[index];
+        const isComplete = isPhaseComplete(phaseId);
+        const isUnlocked = index === 0 || isPhaseComplete(phaseIds[index - 1]);
+        const link = step.querySelector(".route-step-link");
+        const status = step.querySelector(".route-step-status");
+
+        step.classList.toggle("is-complete", isComplete);
+        step.classList.toggle("is-locked", !isUnlocked);
+        status.textContent = isComplete ? "✓ Complete" : isUnlocked ? "Not complete" : "Locked";
+        link.dataset.unlocked = String(isUnlocked);
+        link.setAttribute("aria-disabled", String(!isUnlocked));
+        if (!isUnlocked) {
+          link.setAttribute("aria-label", `Phase ${phaseId}, locked. Complete Phase ${index} first.`);
+        } else {
+          link.removeAttribute("aria-label");
+        }
+      });
+
+      const allPhasesComplete = phaseIds.every(isPhaseComplete);
+      if (allPhasesComplete) {
+        localStorage.setItem(questKey, "finished");
+      } else {
+        localStorage.removeItem(questKey);
+      }
+      completeLink.classList.toggle("is-locked", !allPhasesComplete);
+      completeLink.dataset.unlocked = String(allPhasesComplete);
+      completeLink.setAttribute("aria-disabled", String(!allPhasesComplete));
+      completeLink.querySelector("span").textContent = allPhasesComplete ? "Quest Complete!" : "Complete Quest";
+      resetButton.disabled = !phaseIds.some(isPhaseComplete);
+    };
+
+    document.querySelectorAll(".route-step-link, .complete-link").forEach((link) => {
+      link.addEventListener("click", (event) => {
+        if (link.dataset.unlocked !== "true") {
+          event.preventDefault();
+          const step = link.closest(".route-step");
+          if (step) {
+            const phaseNumber = Array.prototype.indexOf.call(document.querySelectorAll(".route-step"), step) + 1;
+            progressMessage.textContent = `Complete Phase ${phaseNumber - 1} to unlock Phase ${phaseNumber}.`;
+          } else {
+            progressMessage.textContent = "Complete all three phases to finish the Spanish Quest.";
+          }
+        }
+      });
+    });
+
+    resetButton.addEventListener("click", () => {
+      if (!window.confirm("Reset all Spanish phase progress?")) {
+        return;
+      }
+
+      phaseIds.forEach((phaseId) => localStorage.removeItem(phaseKey(phaseId)));
+      updateProgress();
+      progressMessage.textContent = "Spanish progress has been reset. Complete Phase 1 to begin.";
+    });
+
+    updateProgress();
+  </script>
+  <script src="site-audio.js" defer></script>
+</body>
+</html>

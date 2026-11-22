@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#493722">
+  <title>HistoryRunnn | Japan Phase 1</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: #fff8e9;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .background {
+      position: fixed;
+      z-index: -1;
+      inset: 0;
+    }
+
+    .background img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    main {
+      display: grid;
+      min-height: 100vh;
+      min-height: 100svh;
+      place-items: center;
+      padding: clamp(16px, 4vw, 36px);
+    }
+
+    .phase-board {
+      position: relative;
+      isolation: isolate;
+      width: min(100%, 900px);
+      padding: clamp(22px, 5vw, 52px);
+      color: #493722;
+      background:
+        radial-gradient(ellipse at 12% 18%, rgb(128 86 43 / 12%), transparent 26%),
+        radial-gradient(ellipse at 88% 82%, rgb(128 86 43 / 10%), transparent 24%),
+        repeating-linear-gradient(1deg, rgb(121 82 40 / 4%) 0 1px, transparent 1px 6px),
+        linear-gradient(135deg, #f7e8c7, #dbbd85);
+      border: clamp(8px, 1.5vw, 16px) ridge #805b32;
+      border-radius: 12px;
+      box-shadow: 0 18px 60px rgb(25 18 10 / 55%), inset 0 0 0 3px rgb(255 246 221 / 55%), inset 0 0 28px rgb(95 61 24 / 14%);
+    }
+
+    .phase-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 16px;
+      padding: 8px 13px;
+      color: #fff3d4;
+      background: linear-gradient(135deg, #8b493b, #542c2a);
+      border: 2px solid #dfb873;
+      border-radius: 999px;
+      box-shadow: 0 3px 8px rgb(20 10 14 / 30%);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .phase-kicker svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    h1 {
+      margin: 0;
+      color: #5f4225;
+      font-size: clamp(1.9rem, 5.5vw, 3.2rem);
+      font-variant: small-caps;
+      line-height: 1.12;
+      text-shadow: 0 1px 0 rgb(255 248 230 / 70%);
+    }
+
+    .phase-subtitle {
+      margin: 8px 0 0;
+      color: #536e5c;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .phase-intro {
+      max-width: 760px;
+      margin: 14px 0 22px;
+      font-size: 1.05rem;
+      line-height: 1.65;
+    }
+
+    .events-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0 0 14px;
+      color: #365775;
+      font-size: 1.05rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .events-title::after {
+      height: 1px;
+      flex: 1;
+      background: rgb(54 87 117 / 28%);
+      content: "";
+    }
+
+    .event-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin: 0 0 26px;
+      padding: 0;
+      list-style: none;
+      counter-reset: event;
+    }
+
+    .event-item {
+      display: grid;
+      grid-template-columns: 32px minmax(0, 1fr);
+      align-content: start;
+      column-gap: 12px;
+      min-height: 146px;
+      padding: 15px;
+      background: rgb(255 249 228 / 68%);
+      border-left: 4px solid #8b493b;
+      box-shadow: inset 0 0 0 1px rgb(122 83 40 / 16%);
+    }
+
+    .event-item::before {
+      grid-column: 1;
+      grid-row: 1 / span 3;
+      display: grid;
+      width: 30px;
+      height: 30px;
+      place-items: center;
+      color: #fff3d4;
+      background: #8b493b;
+      border-radius: 50%;
+      content: counter(event);
+      counter-increment: event;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .event-date,
+    .event-item h2,
+    .event-item p {
+      grid-column: 2;
+    }
+
+    .event-date {
+      color: #536e5c;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      line-height: 1.4;
+      text-transform: uppercase;
+    }
+
+    .event-item h2 {
+      margin: 0 0 5px;
+      color: #674723;
+      font-size: 1.05rem;
+    }
+
+    .event-item p {
+      margin: 0;
+      font-size: 0.98rem;
+      line-height: 1.55;
+    }
+
+    .phase-animation {
+      position: relative;
+      height: clamp(140px, 24vw, 190px);
+      margin: 0 0 26px;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse at 20% 28%, rgb(255 255 255 / 62%) 0 5%, transparent 6%),
+        radial-gradient(ellipse at 72% 38%, rgb(255 255 255 / 48%) 0 4%, transparent 5%),
+        linear-gradient(180deg, #b9d1cf 0 58%, #799b9a 59% 62%, #d4bd8c 63%);
+      border: 3px solid #805b32;
+      border-radius: 8px;
+      box-shadow: inset 0 0 0 3px rgb(255 248 230 / 35%), 0 5px 12px rgb(63 45 26 / 18%);
+    }
+
+    .aircraft {
+      position: absolute;
+      top: 16px;
+      left: -60px;
+      width: 54px;
+      height: 24px;
+      color: #493722;
+      animation: fly-across 9s linear infinite;
+    }
+
+    .aircraft--second {
+      top: 42px;
+      width: 38px;
+      height: 17px;
+      opacity: 0.72;
+      animation-duration: 12s;
+      animation-delay: -5s;
+    }
+
+    @keyframes fly-across {
+      to {
+        left: 100%;
+        transform: translateX(60px);
+      }
+    }
+
+    .return-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 46px;
+      padding: 12px 20px;
+      color: #fff3d4;
+      background: linear-gradient(180deg, #805a2e, #55391d);
+      border: 1px solid #cba66a;
+      border-radius: 6px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .phase-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .complete-phase {
+      min-height: 46px;
+      padding: 12px 20px;
+      color: #493722;
+      background: #f3dfb2;
+      border: 1px solid #a17a4a;
+      border-radius: 6px;
+      font: 600 1rem Georgia, "Times New Roman", serif;
+      cursor: pointer;
+    }
+
+    .complete-phase:disabled {
+      color: #fff3d4;
+      background: #557044;
+      border-color: #78905c;
+      cursor: default;
+    }
+
+    .phase-status {
+      flex-basis: 100%;
+      margin: 0;
+      color: #674723;
+      font-weight: 700;
+    }
+
+    .return-link:focus-visible,
+    .complete-phase:focus-visible {
+      outline: 2px solid #f0cd88;
+      outline-offset: 3px;
+    }
+
+    @media (max-width: 560px) {
+      .event-list {
+        grid-template-columns: 1fr;
+      }
+
+      .event-item {
+        min-height: 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .aircraft {
+        left: 44%;
+        animation: none;
+        transform: none;
+      }
+
+      .aircraft--second {
+        left: 64%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="background">
+    <img src="japan backround.jpg" alt="">
+  </div>
+  <main>
+    <article class="phase-board">
+      <header>
+        <div class="phase-kicker">
+          <svg viewBox="0 0 40 40" aria-hidden="true">
+            <path d="M5 31h30M8 28 20 8l12 20M20 8v22M13 21h14" fill="none" stroke="#f1d176" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+          </svg>
+          <span>Japan Quest · Phase 1</span>
+        </div>
+        <h1>Quest: The Rising Sun Arrives (December 1941)</h1>
+        <p class="phase-subtitle">The invasion of the Philippines · 1941–1942</p>
+      </header>
+      <p class="phase-intro">
+        Hours after the attack on Pearl Harbor, Imperial Japanese forces launch a surprise invasion of the Philippines on
+        <strong>December 8, 1941</strong>.
+      </p>
+      <div class="phase-animation" role="img" aria-label="Aircraft passing over a map.">
+        <svg class="aircraft" viewBox="0 0 60 24" aria-hidden="true">
+          <path d="M2 13 22 10 38 2l5 1-7 7 16 0 8 3-24 3-7 7h-4l3-7z" fill="currentColor"></path>
+        </svg>
+        <svg class="aircraft aircraft--second" viewBox="0 0 60 24" aria-hidden="true">
+          <path d="M2 13 22 10 38 2l5 1-7 7 16 0 8 3-24 3-7 7h-4l3-7z" fill="currentColor"></path>
+        </svg>
+      </div>
+      <h2 class="events-title">Key Events</h2>
+      <ol class="event-list">
+        <li class="event-item">
+          <span class="event-date">December 1941</span>
+          <h2>Air Raids</h2>
+          <p>Japanese planes destroy Allied air defenses at Clark Field and bomb key targets across Luzon and Mindanao.</p>
+        </li>
+        <li class="event-item">
+          <span class="event-date">December 1941</span>
+          <h2>The Pincer Invasion</h2>
+          <p>Led by Lt. Gen. Masaharu Homma, troops storm ashore at Lingayen Gulf, Aparri, Vigan, and Lamon Bay, closing in on the capital from both the north and south.</p>
+        </li>
+        <li class="event-item">
+          <span class="event-date">January 2, 1942</span>
+          <h2>Fall of Manila</h2>
+          <p>Declared an "Open City" to prevent its destruction, Manila is occupied without a fight on <strong>January 2, 1942</strong>.</p>
+        </li>
+        <li class="event-item">
+          <span class="event-date">1942</span>
+          <h2>The Last Stand</h2>
+          <p>Outnumbered Filipino and American forces retreat to the Bataan Peninsula and Corregidor to mount a desperate defense.</p>
+        </li>
+      </ol>
+      <div class="phase-actions">
+        <button class="complete-phase" type="button">Mark Phase Complete</button>
+        <a class="return-link" href="japan.html">Return to Japan Map</a>
+        <p class="phase-status" aria-live="polite"></p>
+      </div>
+    </article>
+  </main>
+  <script>
+    const phaseId = "1";
+    const phaseKey = `historyrunnn.japan.phase.${phaseId}`;
+    const phaseButton = document.querySelector(".complete-phase");
+    const phaseStatus = document.querySelector(".phase-status");
+
+    const showCompletion = () => {
+      phaseButton.disabled = true;
+      phaseButton.textContent = "Phase Complete!";
+      phaseStatus.textContent = "Phase 1 complete — Phase 2 is now unlocked on the Japan map.";
+    };
+
+    if (localStorage.getItem(phaseKey) === "finished") {
+      showCompletion();
+    }
+
+    phaseButton.addEventListener("click", () => {
+      localStorage.setItem(phaseKey, "finished");
+      const allPhasesComplete = ["1", "2", "3"].every((id) =>
+        localStorage.getItem(`historyrunnn.japan.phase.${id}`) === "finished"
+      );
+      if (allPhasesComplete) {
+        localStorage.setItem("historyrunnn.quest.japan", "finished");
+      } else {
+        localStorage.removeItem("historyrunnn.quest.japan");
+      }
+      showCompletion();
+    });
+  </script>
+  <script src="site-audio.js" defer></script>
+</body>
+</html>

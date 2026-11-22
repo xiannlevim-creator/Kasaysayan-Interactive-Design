@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#493722">
+  <title>HistoryRunnn | Japan Phase 3</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: #fff8e9;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .background {
+      position: fixed;
+      z-index: -1;
+      inset: 0;
+    }
+
+    .background img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .background::after {
+      position: absolute;
+      inset: 0;
+      background: rgb(36 27 17 / 48%);
+      content: "";
+    }
+
+    main {
+      display: grid;
+      min-height: 100vh;
+      min-height: 100svh;
+      place-items: center;
+      padding: clamp(16px, 4vw, 36px);
+    }
+
+    .phase-board {
+      width: min(100%, 900px);
+      padding: clamp(22px, 5vw, 52px);
+      color: #493722;
+      background:
+        radial-gradient(ellipse at 12% 18%, rgb(128 86 43 / 12%), transparent 26%),
+        radial-gradient(ellipse at 88% 82%, rgb(128 86 43 / 10%), transparent 24%),
+        repeating-linear-gradient(1deg, rgb(121 82 40 / 4%) 0 1px, transparent 1px 6px),
+        linear-gradient(135deg, #f7e8c7, #dbbd85);
+      border: clamp(8px, 1.5vw, 16px) ridge #805b32;
+      border-radius: 12px;
+      box-shadow: 0 18px 60px rgb(25 18 10 / 55%), inset 0 0 0 3px rgb(255 246 221 / 55%);
+    }
+
+    .phase-content[hidden],
+    .phase-locked[hidden] {
+      display: none;
+    }
+
+    .phase-locked {
+      padding: clamp(18px, 5vw, 32px);
+      background: rgb(255 249 228 / 65%);
+      border: 2px dashed #805b32;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .phase-locked h1 {
+      margin: 0 0 16px;
+      color: #5f4225;
+      font-size: clamp(2rem, 8vw, 3rem);
+      font-variant: small-caps;
+    }
+
+    .phase-locked p {
+      line-height: 1.6;
+    }
+
+    .phase-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 16px;
+      padding: 8px 13px;
+      color: #fff3d4;
+      background: linear-gradient(135deg, #8b6a2e, #51401f);
+      border: 2px solid #dfb873;
+      border-radius: 999px;
+      box-shadow: 0 3px 8px rgb(20 10 14 / 30%);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .phase-kicker svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    h1 {
+      margin: 0;
+      color: #5f4225;
+      font-size: clamp(1.9rem, 5.5vw, 3.2rem);
+      font-variant: small-caps;
+      line-height: 1.12;
+      text-shadow: 0 1px 0 rgb(255 248 230 / 70%);
+    }
+
+    .phase-subtitle {
+      margin: 8px 0 0;
+      color: #536e5c;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .phase-intro {
+      max-width: 760px;
+      margin: 14px 0 22px;
+      font-size: 1.05rem;
+      line-height: 1.65;
+    }
+
+    .market-scene {
+      height: clamp(140px, 24vw, 190px);
+      margin: 0 0 26px;
+      overflow: hidden;
+      background: #d6dfcd;
+      border: 3px solid #805b32;
+      border-radius: 8px;
+      box-shadow: inset 0 0 0 3px rgb(255 248 230 / 35%), 0 5px 12px rgb(63 45 26 / 18%);
+    }
+
+    .market-scene svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .market-coin {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: coin-turn 2.8s ease-in-out infinite;
+    }
+
+    .market-coin--second {
+      animation-delay: -1.3s;
+    }
+
+    .market-goods {
+      transform-box: fill-box;
+      transform-origin: center bottom;
+      animation: goods-sway 3.4s ease-in-out infinite alternate;
+    }
+
+    @keyframes coin-turn {
+      0%,
+      100% {
+        transform: rotateY(0deg) translateY(0);
+      }
+
+      50% {
+        transform: rotateY(180deg) translateY(-5px);
+      }
+    }
+
+    @keyframes goods-sway {
+      to {
+        transform: rotate(2deg);
+      }
+    }
+
+    .events-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0 0 14px;
+      color: #79602b;
+      font-size: 1.05rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .events-title::after {
+      height: 1px;
+      flex: 1;
+      background: rgb(121 96 43 / 28%);
+      content: "";
+    }
+
+    .event-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin: 0 0 26px;
+      padding: 0;
+      list-style: none;
+      counter-reset: event;
+    }
+
+    .event-item {
+      display: grid;
+      grid-template-columns: 32px minmax(0, 1fr);
+      align-content: start;
+      column-gap: 12px;
+      min-height: 146px;
+      padding: 15px;
+      background: rgb(255 249 228 / 68%);
+      border-left: 4px solid #8b6a2e;
+      box-shadow: inset 0 0 0 1px rgb(122 83 40 / 16%);
+    }
+
+    .event-item::before {
+      grid-column: 1;
+      grid-row: 1 / span 3;
+      display: grid;
+      width: 30px;
+      height: 30px;
+      place-items: center;
+      color: #fff3d4;
+      background: #8b6a2e;
+      border-radius: 50%;
+      content: counter(event);
+      counter-increment: event;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .event-date,
+    .event-item h2,
+    .event-item p {
+      grid-column: 2;
+    }
+
+    .event-date {
+      color: #536e5c;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      line-height: 1.4;
+      text-transform: uppercase;
+    }
+
+    .event-item h2 {
+      margin: 0 0 5px;
+      color: #674723;
+      font-size: 1.05rem;
+    }
+
+    .event-item p {
+      margin: 0;
+      font-size: 0.98rem;
+      line-height: 1.55;
+    }
+
+    .phase-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .complete-phase,
+    .return-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 12px 20px;
+      border: 1px solid #a17a4a;
+      border-radius: 6px;
+      font: 600 1rem Georgia, "Times New Roman", serif;
+      text-decoration: none;
+    }
+
+    .complete-phase {
+      color: #493722;
+      background: #f3dfb2;
+      cursor: pointer;
+    }
+
+    .complete-phase:disabled {
+      color: #fff3d4;
+      background: #557044;
+      border-color: #78905c;
+      cursor: default;
+    }
+
+    .return-link {
+      color: #fff3d4;
+      background: linear-gradient(180deg, #805a2e, #55391d);
+      border-color: #cba66a;
+      box-shadow: 0 4px 10px rgb(37 25 12 / 25%);
+    }
+
+    .complete-phase:focus-visible,
+    .return-link:focus-visible {
+      outline: 2px solid #f0cd88;
+      outline-offset: 3px;
+    }
+
+    .phase-status {
+      flex-basis: 100%;
+      margin: 0;
+      color: #674723;
+      font-weight: 700;
+    }
+
+    @media (max-width: 560px) {
+      .event-list {
+        grid-template-columns: 1fr;
+      }
+
+      .event-item {
+        min-height: 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .market-coin,
+      .market-goods {
+        animation: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="background">
+    <img src="japan backround.jpg" alt="">
+  </div>
+  <main>
+    <article class="phase-board">
+      <section class="phase-locked">
+        <p>Japan Quest</p>
+        <h1>Phase 3 is Locked</h1>
+        <p>Complete Phase 2 before you can continue to Phase 3.</p>
+        <a class="return-link" href="japan.html">Return to Japan Map</a>
+      </section>
+      <div class="phase-content" hidden>
+        <header>
+          <div class="phase-kicker">
+            <svg viewBox="0 0 40 40" aria-hidden="true">
+              <circle cx="20" cy="20" r="13" fill="none" stroke="#f1d176" stroke-width="2.5"></circle>
+              <path d="M14 16h12m-12 5h12m-12 5h12" stroke="#f1d176" stroke-linecap="round" stroke-width="2"></path>
+            </svg>
+            <span>Japan Quest · Phase 3</span>
+          </div>
+          <h1>Quest: Survival in the Black Market (1942–1945)</h1>
+          <p class="phase-subtitle">Occupation currency · shortages · barter</p>
+        </header>
+        <p class="phase-intro">
+          During the Japanese occupation, shortages and inflation reshaped daily life in the Philippines.
+          As occupation-issued currency lost value and ordinary supplies became scarce, many people relied
+          on informal markets, bartering, and community networks to find food and other necessities.
+        </p>
+        <div class="market-scene" role="img" aria-label="A wartime market stall with sacks of rice and coins, representing barter and shortages.">
+          <svg viewBox="0 0 760 190" aria-hidden="true">
+            <rect width="760" height="190" fill="#d6dfcd"></rect>
+            <circle cx="650" cy="40" r="21" fill="#e7c56e" opacity=".8"></circle>
+            <path d="M0 126 116 78l103 48 124-60 116 60 111-43 190 43v64H0z" fill="#9ca98a"></path>
+            <path d="M0 145h760v45H0z" fill="#806443"></path>
+            <path d="M0 153h760M52 157v33m94-33v33m94-33v33m94-33v33m94-33v33m94-33v33m94-33v33m94-33v33" stroke="#b48b58" stroke-width="2" opacity=".55"></path>
+            <path d="M222 74h318l-20 27H242z" fill="#8b493b" stroke="#805b32" stroke-width="4"></path>
+            <path d="M254 75v25m58-25v25m58-25v25m58-25v25m58-25v25" stroke="#f3dfb2" stroke-width="16"></path>
+            <path d="M241 101h279v48H241z" fill="#c69a5a" stroke="#805b32" stroke-width="4"></path>
+            <path d="M256 110h250" stroke="#f3dfb2" stroke-width="4" opacity=".75"></path>
+            <path d="M257 149v22m247-22v22" stroke="#70421d" stroke-width="8"></path>
+            <g class="market-goods">
+              <path d="M277 132c2-17 8-24 19-24s17 7 19 24l-5 15h-28z" fill="#d8c294" stroke="#805b32" stroke-width="3"></path>
+              <path d="M283 111h26m-22-5 5-7m12 7-5-7" stroke="#805b32" stroke-linecap="round" stroke-width="3"></path>
+              <path d="M337 137c6-11 13-16 21-16s15 5 21 16l-5 10h-32z" fill="#92764f" stroke="#684e31" stroke-width="3"></path>
+              <path d="M347 122v-8m12 8v-8m-18 30h33" stroke="#d8c294" stroke-linecap="round" stroke-width="3"></path>
+            </g>
+            <g class="market-coin" fill="#e4bd4e" stroke="#805b32" stroke-width="3">
+              <ellipse cx="437" cy="137" rx="18" ry="7"></ellipse>
+              <path d="M419 128v9c0 4 8 7 18 7s18-3 18-7v-9"></path>
+              <ellipse cx="437" cy="128" rx="18" ry="7"></ellipse>
+              <circle cx="437" cy="128" r="4" fill="none" stroke="#fff0a7" stroke-width="2"></circle>
+            </g>
+            <g class="market-coin market-coin--second">
+              <circle cx="480" cy="119" r="12" fill="#edc85f" stroke="#805b32" stroke-width="3"></circle>
+              <circle cx="480" cy="119" r="5" fill="none" stroke="#fff0a7" stroke-width="2"></circle>
+            </g>
+          </svg>
+        </div>
+        <h2 class="events-title">Key Events</h2>
+        <ol class="event-list">
+          <li class="event-item">
+            <span class="event-date">1942 onward</span>
+            <h2>Occupation Currency</h2>
+            <p>Japanese occupation authorities issue paper pesos. As more notes circulate and confidence falls, the money becomes known as “Mickey Mouse money” and rapidly loses purchasing power.</p>
+          </li>
+          <li class="event-item">
+            <span class="event-date">1942–1945</span>
+            <h2>Shortages and Rising Prices</h2>
+            <p>Wartime disruption and scarcity make food, medicine, fuel, and other everyday goods increasingly difficult to obtain through official channels.</p>
+          </li>
+          <li class="event-item">
+            <span class="event-date">Throughout the occupation</span>
+            <h2>Barter and Black Markets</h2>
+            <p>Families trade rice, clothing, tools, and other necessities outside regulated markets. Bartering helps people obtain essentials when money cannot keep up with prices.</p>
+          </li>
+          <li class="event-item">
+            <span class="event-date">1942–1945</span>
+            <h2>Networks of Survival</h2>
+            <p>Neighbors, farmers, and local traders share information and supplies between communities, forming informal networks that help people endure the occupation.</p>
+          </li>
+        </ol>
+        <div class="phase-actions">
+          <button class="complete-phase" type="button">Mark Phase Complete</button>
+          <a class="return-link" href="japan.html">Return to Japan Map</a>
+          <p class="phase-status" aria-live="polite"></p>
+        </div>
+      </div>
+    </article>
+  </main>
+  <script>
+    const prerequisiteKey = "historyrunnn.japan.phase.2";
+    const phaseKey = "historyrunnn.japan.phase.3";
+    const phaseContent = document.querySelector(".phase-content");
+    const lockedMessage = document.querySelector(".phase-locked");
+
+    if (localStorage.getItem(prerequisiteKey) === "finished") {
+      lockedMessage.hidden = true;
+      phaseContent.hidden = false;
+    }
+
+    const phaseButton = document.querySelector(".complete-phase");
+    const phaseStatus = document.querySelector(".phase-status");
+    const showCompletion = () => {
+      phaseButton.disabled = true;
+      phaseButton.textContent = "Phase Complete!";
+      phaseStatus.textContent = "Japan Quest complete — all three phases are finished.";
+    };
+
+    if (!phaseContent.hidden && localStorage.getItem(phaseKey) === "finished") {
+      showCompletion();
+    }
+
+    phaseButton.addEventListener("click", () => {
+      if (phaseContent.hidden) return;
+
+      localStorage.setItem(phaseKey, "finished");
+      const allPhasesComplete = ["1", "2", "3"].every((id) =>
+        localStorage.getItem(`historyrunnn.japan.phase.${id}`) === "finished"
+      );
+      if (allPhasesComplete) {
+        localStorage.setItem("historyrunnn.quest.japan", "finished");
+      } else {
+        localStorage.removeItem("historyrunnn.quest.japan");
+      }
+      showCompletion();
+    });
+  </script>
+  <script src="site-audio.js" defer></script>
+</body>
+</html>

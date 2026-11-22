@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#493722">
+  <title>HistoryRunnn | America Phase 2</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: #493722;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .background {
+      position: fixed;
+      z-index: -1;
+      inset: 0;
+    }
+
+    .background img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .background::after {
+      position: absolute;
+      inset: 0;
+      background: rgb(36 27 17 / 52%);
+      content: "";
+    }
+
+    main {
+      display: grid;
+      min-height: 100vh;
+      min-height: 100svh;
+      place-items: center;
+      padding: clamp(16px, 4vw, 36px);
+    }
+
+    .phase-board {
+      width: min(100%, 900px);
+      padding: clamp(22px, 5vw, 52px);
+      background:
+        radial-gradient(ellipse at 12% 18%, rgb(128 86 43 / 12%), transparent 26%),
+        repeating-linear-gradient(1deg, rgb(121 82 40 / 4%) 0 1px, transparent 1px 6px),
+        linear-gradient(135deg, #f7e8c7, #dbbd85);
+      border: clamp(8px, 1.5vw, 16px) ridge #805b32;
+      border-radius: 12px;
+      box-shadow: 0 18px 60px rgb(25 18 10 / 55%), inset 0 0 0 3px rgb(255 246 221 / 55%);
+    }
+
+    .phase-content[hidden] {
+      display: none;
+    }
+
+    .phase-locked {
+      padding: clamp(18px, 5vw, 32px);
+      background: rgb(255 249 228 / 65%);
+      border: 2px dashed #805b32;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .phase-locked h1 {
+      margin: 0 0 16px;
+      color: #5f4225;
+      font-size: clamp(2rem, 8vw, 3rem);
+      font-variant: small-caps;
+    }
+
+    .phase-locked p {
+      line-height: 1.6;
+    }
+
+    .phase-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 16px;
+      padding: 8px 13px;
+      color: #fff3d4;
+      background: linear-gradient(135deg, #365775, #1d3448);
+      border: 2px solid #dfb873;
+      border-radius: 999px;
+      box-shadow: 0 3px 8px rgb(20 10 14 / 30%);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .phase-kicker svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    h1 {
+      margin: 0;
+      color: #5f4225;
+      font-size: clamp(1.9rem, 5.5vw, 3.2rem);
+      font-variant: small-caps;
+      line-height: 1.12;
+      text-shadow: 0 1px 0 rgb(255 248 230 / 70%);
+    }
+
+    .phase-intro {
+      max-width: 760px;
+      margin: 14px 0 22px;
+      font-size: 1.05rem;
+      line-height: 1.65;
+    }
+
+    .phase-subtitle {
+      margin: 8px 0 0;
+      color: #536e5c;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .classroom-scene {
+      position: relative;
+      height: clamp(140px, 24vw, 190px);
+      margin: 0 0 26px;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, #d6dfcd 0 73%, #92764f 73% 76%, #684f38 76% 100%);
+      border: 3px solid #805b32;
+      border-radius: 8px;
+      box-shadow: inset 0 0 0 3px rgb(255 248 230 / 35%), 0 5px 12px rgb(63 45 26 / 18%);
+    }
+
+    .classroom-scene svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .chalk-letters {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: chalk-glow 3.5s ease-in-out infinite;
+    }
+
+    .classroom-book {
+      transform-box: fill-box;
+      transform-origin: center bottom;
+      animation: book-lift 3s ease-in-out infinite;
+    }
+
+    @keyframes chalk-glow {
+      0%,
+      100% {
+        opacity: 0.78;
+      }
+
+      50% {
+        opacity: 1;
+      }
+    }
+
+    @keyframes book-lift {
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-4px);
+      }
+    }
+
+    .events-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0 0 14px;
+      color: #365775;
+      font-size: 1.05rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .events-title::after {
+      height: 1px;
+      flex: 1;
+      background: rgb(54 87 117 / 28%);
+      content: "";
+    }
+
+    .event-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin: 0 0 26px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .event-item {
+      display: grid;
+      grid-template-columns: 32px minmax(0, 1fr);
+      align-content: start;
+      column-gap: 12px;
+      min-height: 146px;
+      padding: 15px;
+      background: rgb(255 249 228 / 68%);
+      border-left: 4px solid #365775;
+      box-shadow: inset 0 0 0 1px rgb(122 83 40 / 16%);
+    }
+
+    .event-date {
+      grid-column: 2;
+      color: #536e5c;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      line-height: 1.4;
+      text-transform: uppercase;
+    }
+
+    .event-item::before {
+      grid-column: 1;
+      grid-row: 1 / span 3;
+      display: grid;
+      width: 30px;
+      height: 30px;
+      place-items: center;
+      color: #fff3d4;
+      background: #365775;
+      border-radius: 50%;
+      content: counter(lesson);
+      counter-increment: lesson;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .event-list {
+      counter-reset: lesson;
+    }
+
+    .event-item h2 {
+      grid-column: 2;
+      margin: 0 0 5px;
+      color: #674723;
+      font-size: 1.05rem;
+    }
+
+    .event-item p {
+      grid-column: 2;
+      margin: 0;
+      font-size: 0.98rem;
+      line-height: 1.55;
+    }
+
+    .phase-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .complete-phase {
+      padding: 12px 20px;
+      color: #493722;
+      background: #f3dfb2;
+      border: 1px solid #a17a4a;
+      border-radius: 6px;
+      font: 600 1rem Georgia, "Times New Roman", serif;
+      cursor: pointer;
+    }
+
+    .complete-phase:disabled {
+      color: #fff3d4;
+      background: #557044;
+      border-color: #78905c;
+      cursor: default;
+    }
+
+    .return-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 12px 20px;
+      color: #fff3d4;
+      background: linear-gradient(180deg, #805a2e, #55391d);
+      border: 1px solid #cba66a;
+      border-radius: 6px;
+      box-shadow: 0 4px 10px rgb(37 25 12 / 25%);
+      font-weight: 600;
+      text-decoration: none;
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .return-link:hover {
+      box-shadow: 0 7px 14px rgb(37 25 12 / 35%);
+      transform: translateY(-2px);
+    }
+
+    .return-link:focus-visible,
+    .complete-phase:focus-visible {
+      outline: 2px solid #f0cd88;
+      outline-offset: 3px;
+    }
+
+    .phase-status {
+      flex-basis: 100%;
+      margin: 0;
+      color: #674723;
+      font-weight: 700;
+    }
+
+    @media (max-width: 560px) {
+      .event-list {
+        grid-template-columns: 1fr;
+      }
+
+      .event-item {
+        min-height: 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .chalk-letters,
+      .classroom-book {
+        animation: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="background">
+    <img src="us backround.jpg" alt="">
+  </div>
+  <main>
+    <article class="phase-board">
+      <section class="phase-locked">
+        <p class="phase-label">America Quest</p>
+        <h1>Phase 2 is Locked</h1>
+        <p>Complete Phase 1 before you can continue to Phase 2.</p>
+        <a class="return-link" href="america.html">Return to America Map</a>
+      </section>
+      <div class="phase-content" hidden>
+        <header>
+          <div class="phase-kicker">
+            <svg viewBox="0 0 40 40" aria-hidden="true">
+              <path d="M7 9h26v23H7zM12 15h16M12 20h16M12 25h10" fill="none" stroke="#f1d176" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+            </svg>
+            <span>America Quest · Phase 2</span>
+          </div>
+          <h1>Quest: Hearts and Minds (1901)</h1>
+          <p class="phase-subtitle">The Thomasites and public education</p>
+        </header>
+        <p class="phase-intro">
+          Following the pacification of the archipelago, the United States deploys education as a strategic tool to win over the Filipino population and introduce American governance, culture, and ideals.
+        </p>
+        <div class="classroom-scene" role="img" aria-label="A 1901 classroom with a teacher writing the alphabet on a chalkboard and books on a desk.">
+          <svg viewBox="0 0 760 190" aria-hidden="true">
+            <rect width="760" height="190" fill="#d6dfcd"></rect>
+            <path d="M0 148h760v42H0z" fill="#806443"></path>
+            <path d="M0 155h760M34 158v32m82-32v32m82-32v32m82-32v32m82-32v32m82-32v32m82-32v32m82-32v32m82-32v32" stroke="#b48b58" stroke-width="2" opacity=".55"></path>
+            <rect x="22" y="20" width="103" height="92" rx="3" fill="#f4e3ba" stroke="#805b32" stroke-width="7"></rect>
+            <path d="M73 23v86M25 66h97" stroke="#9e7a4e" stroke-width="4"></path>
+            <path d="M27 27h43v35H27zm51 0h42v35H78zm-51 44h43v36H27zm51 0h42v36H78z" fill="#b9d1c5" opacity=".72"></path>
+            <rect x="153" y="19" width="424" height="105" rx="4" fill="#294744" stroke="#76532f" stroke-width="8"></rect>
+            <path d="M176 108h379" stroke="#e6d5aa" stroke-width="3" opacity=".65"></path>
+            <g class="chalk-letters" fill="#f7edcf" font-family="Georgia, serif" font-size="38" font-weight="700">
+              <text x="252" y="78">A</text>
+              <text x="340" y="78">B</text>
+              <text x="428" y="78">C</text>
+            </g>
+            <path d="M609 62c0-15 10-25 23-25s22 10 22 25v13h-45z" fill="#805b32"></path>
+            <circle cx="632" cy="48" r="13" fill="#c99562"></circle>
+            <path d="M615 78h36l13 53h-60z" fill="#365775"></path>
+            <path d="M617 86l-27 22m45-14-36 11" fill="none" stroke="#c99562" stroke-linecap="round" stroke-width="9"></path>
+            <path d="M583 103l-9-5m9 5-10 2" stroke="#f7edcf" stroke-linecap="round" stroke-width="3"></path>
+            <path d="M188 136h351l-20 12H208z" fill="#5b4129"></path>
+            <path d="M204 148v24m319-24v24" stroke="#5b4129" stroke-width="8"></path>
+            <g class="classroom-book">
+              <path d="M300 135c18-9 37-8 54 0v15c-17-8-36-9-54 0z" fill="#f2dfa9" stroke="#805b32" stroke-width="2"></path>
+              <path d="M354 135c17-8 36-9 54 0v15c-18-9-37-8-54 0z" fill="#fff4d8" stroke="#805b32" stroke-width="2"></path>
+              <path d="M354 135v15" stroke="#805b32" stroke-width="2"></path>
+            </g>
+            <path d="M635 132h72l-7 11h-59z" fill="#f2dfa9" stroke="#805b32" stroke-width="2"></path>
+            <path d="M647 129l6-12h25l7 12z" fill="#b86b43" stroke="#805b32" stroke-width="2"></path>
+          </svg>
+        </div>
+        <h2 class="events-title">Building a school system</h2>
+        <ol class="event-list">
+          <li class="event-item">
+            <span class="event-date">August 21, 1901</span>
+            <h2>Arrival of the Thomasites</h2>
+            <p>Over 500 American teachers arrive in Manila aboard the <em>USS Thomas</em> to establish public schools and train local educators across the provinces.</p>
+          </li>
+          <li class="event-item">
+            <span class="event-date">Act No. 74</span>
+            <h2>Free Public Education</h2>
+            <p>Act No. 74 establishes the Department of Public Instruction, making primary education free and accessible to all Filipinos regardless of social class.</p>
+          </li>
+          <li class="event-item">
+            <span class="event-date">New Curriculum</span>
+            <h2>English as the Medium</h2>
+            <p>English becomes the official language of instruction across all school levels to unify communication and accelerate the adoption of the new curriculum.</p>
+          </li>
+          <li class="event-item">
+            <span class="event-date">1901 and 1908</span>
+            <h2>Founding of Institutions</h2>
+            <p>New higher learning centers are established, including the Philippine Normal School (now PNU) in 1901 for teacher training and the University of the Philippines (UP) in 1908.</p>
+          </li>
+        </ol>
+        <div class="phase-actions">
+          <button class="complete-phase" type="button">Mark Phase Complete</button>
+          <a class="return-link" href="america.html">
+            <span aria-hidden="true">←</span>
+            <span>Return to America Map</span>
+          </a>
+          <p class="phase-status" aria-live="polite"></p>
+        </div>
+      </div>
+    </article>
+  </main>
+  <script>
+    const prerequisiteKey = "historyrunnn.america.phase.1";
+    const phaseKey = "historyrunnn.america.phase.2";
+    const phaseContent = document.querySelector(".phase-content");
+    const lockedMessage = document.querySelector(".phase-locked");
+
+    if (localStorage.getItem(prerequisiteKey) === "finished") {
+      lockedMessage.hidden = true;
+      phaseContent.hidden = false;
+    }
+
+    const phaseButton = document.querySelector(".complete-phase");
+    const phaseStatus = document.querySelector(".phase-status");
+    const showCompletion = () => {
+      phaseButton.disabled = true;
+      phaseButton.textContent = "Phase Complete!";
+      phaseStatus.textContent = "Phase 2 complete — Phase 3 is now unlocked on the America map.";
+    };
+
+    if (!phaseContent.hidden && localStorage.getItem(phaseKey) === "finished") {
+      showCompletion();
+    }
+
+    phaseButton.addEventListener("click", () => {
+      if (phaseContent.hidden) {
+        return;
+      }
+
+      localStorage.setItem(phaseKey, "finished");
+      const allPhasesComplete = ["1", "2", "3"].every((id) =>
+        localStorage.getItem(`historyrunnn.america.phase.${id}`) === "finished"
+      );
+      if (allPhasesComplete) {
+        localStorage.setItem("historyrunnn.quest.america", "finished");
+      } else {
+        localStorage.removeItem("historyrunnn.quest.america");
+      }
+      showCompletion();
+    });
+  </script>
+  <script src="site-audio.js" defer></script>
+</body>
+</html>

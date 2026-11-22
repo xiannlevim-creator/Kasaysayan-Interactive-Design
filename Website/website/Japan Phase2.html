@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#493722">
+  <title>HistoryRunnn | Japan Phase 2</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: #fff8e9;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .background {
+      position: fixed;
+      z-index: -1;
+      inset: 0;
+    }
+
+    .background img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    main {
+      display: grid;
+      min-height: 100vh;
+      min-height: 100svh;
+      place-items: center;
+      padding: clamp(16px, 4vw, 36px);
+    }
+
+    .phase-board {
+      position: relative;
+      isolation: isolate;
+      width: min(100%, 900px);
+      padding: clamp(22px, 5vw, 52px);
+      color: #493722;
+      background:
+        radial-gradient(ellipse at 12% 18%, rgb(128 86 43 / 12%), transparent 26%),
+        radial-gradient(ellipse at 88% 82%, rgb(128 86 43 / 10%), transparent 24%),
+        repeating-linear-gradient(1deg, rgb(121 82 40 / 4%) 0 1px, transparent 1px 6px),
+        linear-gradient(135deg, #f7e8c7, #dbbd85);
+      border: clamp(8px, 1.5vw, 16px) ridge #805b32;
+      border-radius: 12px;
+      box-shadow: 0 18px 60px rgb(25 18 10 / 55%), inset 0 0 0 3px rgb(255 246 221 / 55%), inset 0 0 28px rgb(95 61 24 / 14%);
+    }
+
+    .phase-content[hidden] {
+      display: none;
+    }
+
+    .phase-locked {
+      padding: clamp(18px, 5vw, 32px);
+      background: rgb(255 249 228 / 65%);
+      border: 2px dashed #805b32;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .phase-locked h1 {
+      margin-bottom: 16px;
+    }
+
+    .phase-locked p {
+      line-height: 1.6;
+    }
+
+    .phase-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 16px;
+      padding: 8px 13px;
+      color: #fff3d4;
+      background: linear-gradient(135deg, #315d62, #1c3e43);
+      border: 2px solid #dfb873;
+      border-radius: 999px;
+      box-shadow: 0 3px 8px rgb(20 10 14 / 30%);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .phase-kicker svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    h1 {
+      margin: 0;
+      color: #5f4225;
+      font-size: clamp(1.9rem, 5.5vw, 3.2rem);
+      font-variant: small-caps;
+      line-height: 1.12;
+      text-shadow: 0 1px 0 rgb(255 248 230 / 70%);
+    }
+
+    .phase-subtitle {
+      margin: 8px 0 0;
+      color: #536e5c;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .phase-intro {
+      max-width: 760px;
+      margin: 14px 0 22px;
+      font-size: 1.05rem;
+      line-height: 1.65;
+    }
+
+    .phase-scene {
+      height: clamp(140px, 24vw, 190px);
+      margin: 0 0 26px;
+      overflow: hidden;
+      background: #d6dfcd;
+      border: 3px solid #805b32;
+      border-radius: 8px;
+      box-shadow: inset 0 0 0 3px rgb(255 248 230 / 35%), 0 5px 12px rgb(63 45 26 / 18%);
+    }
+
+    .phase-scene svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .puppet-strings {
+      animation: strings-pull 3s ease-in-out infinite alternate;
+    }
+
+    .puppet-arm {
+      transform-box: fill-box;
+      transform-origin: center top;
+      animation: puppet-sway 2.4s ease-in-out infinite alternate;
+    }
+
+    @keyframes strings-pull {
+      to { opacity: 0.65; }
+    }
+
+    @keyframes puppet-sway {
+      to { transform: rotate(4deg); }
+    }
+
+    .events-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0 0 14px;
+      color: #315d62;
+      font-size: 1.05rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .events-title::after {
+      height: 1px;
+      flex: 1;
+      background: rgb(49 93 98 / 28%);
+      content: "";
+    }
+
+    .event-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin: 0 0 26px;
+      padding: 0;
+      list-style: none;
+      counter-reset: event;
+      counter-reset: event;
+    }
+
+    .event-item {
+      display: grid;
+      grid-template-columns: 32px minmax(0, 1fr);
+      align-content: start;
+      column-gap: 12px;
+      min-height: 146px;
+      padding: 15px;
+      background: rgb(255 249 228 / 68%);
+      border-left: 4px solid #315d62;
+      box-shadow: inset 0 0 0 1px rgb(122 83 40 / 16%);
+    }
+
+    .event-item::before {
+      grid-column: 1;
+      grid-row: 1 / span 3;
+      display: grid;
+      width: 30px;
+      height: 30px;
+      place-items: center;
+      color: #fff3d4;
+      background: #315d62;
+      border-radius: 50%;
+      content: counter(event);
+      counter-increment: event;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .event-date,
+    .event-item h2,
+    .event-item p {
+      grid-column: 2;
+    }
+
+    .event-date {
+      color: #536e5c;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      line-height: 1.4;
+      text-transform: uppercase;
+    }
+
+    .event-item h2 {
+      margin: 0 0 5px;
+      color: #674723;
+      font-size: 1.05rem;
+    }
+
+    .event-item p {
+      margin: 0;
+      font-size: 0.98rem;
+      line-height: 1.55;
+    }
+
+    .return-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 46px;
+      padding: 12px 20px;
+      color: #fff3d4;
+      background: linear-gradient(180deg, #805a2e, #55391d);
+      border: 1px solid #cba66a;
+      border-radius: 6px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .minor-branch-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 46px;
+      padding: 11px 18px;
+      color: #674723;
+      background: rgb(255 249 228 / 80%);
+      border: 2px dashed #805b32;
+      border-radius: 6px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .return-link:focus-visible,
+    .minor-branch-link:focus-visible {
+      outline: 2px solid #f0cd88;
+      outline-offset: 3px;
+    }
+
+    .board-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .complete-phase {
+      min-height: 46px;
+      padding: 12px 20px;
+      color: #493722;
+      background: #f3dfb2;
+      border: 1px solid #a17a4a;
+      border-radius: 6px;
+      font: 600 1rem Georgia, "Times New Roman", serif;
+      cursor: pointer;
+    }
+
+    .complete-phase:disabled {
+      color: #fff3d4;
+      background: #557044;
+      border-color: #78905c;
+      cursor: default;
+    }
+
+    .phase-status {
+      flex-basis: 100%;
+      margin: 0;
+      color: #674723;
+      font-weight: 700;
+    }
+
+    .complete-phase:focus-visible {
+      outline: 2px solid #f0cd88;
+      outline-offset: 3px;
+    }
+
+    @media (max-width: 560px) {
+      .event-list {
+        grid-template-columns: 1fr;
+      }
+
+      .event-item {
+        min-height: 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .puppet-strings,
+      .puppet-arm {
+        animation: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="background">
+    <img src="japan backround.jpg" alt="">
+  </div>
+  <main>
+    <article class="phase-board">
+      <section class="phase-locked">
+        <p class="phase-label">Japan Quest</p>
+        <h1>Phase 2 is Locked</h1>
+        <p>Complete Phase 1 before you can continue to Phase 2.</p>
+        <a class="return-link" href="japan.html">Return to Japan Map</a>
+      </section>
+      <div class="phase-content" hidden>
+      <header>
+        <div class="phase-kicker">
+          <svg viewBox="0 0 40 40" aria-hidden="true">
+            <path d="M6 32h28M9 29l11-19 11 19M20 10v19m-6-10h12" fill="none" stroke="#f1d176" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+          </svg>
+          <span>Japan Quest · Phase 2</span>
+        </div>
+        <h1>Quest: Shadows of the Second Republic (1942–1945)</h1>
+        <p class="phase-subtitle">The wartime puppet government · 1942–1945</p>
+      </header>
+      <p class="phase-intro">
+        Following the fall of Allied defenses, Japan tightens its grip on the Philippines by establishing a puppet government to project an illusion of independence.
+      </p>
+      <div class="phase-scene" role="img" aria-label="A puppet figure hangs by strings above a stage during the Second Philippine Republic.">
+        <svg viewBox="0 0 760 190" aria-hidden="true">
+          <rect width="760" height="190" fill="#294138"></rect>
+          <path d="M0 0h142l-34 46 34 48-40 48 41 48H0zm760 0H618l34 46-34 48 40 48-41 48h143z" fill="#8b493b"></path>
+          <path d="M110 153h540v37H110z" fill="#70421d"></path>
+          <path d="M126 162h508M156 162v28m98-28v28m98-28v28m98-28v28m98-28v28" stroke="#b48b58" stroke-width="3" opacity=".65"></path>
+          <circle cx="380" cy="54" r="20" fill="#d3ae7c" stroke="#f1d176" stroke-width="3"></circle>
+          <path d="M368 79h24l18 50-30 20-30-20z" fill="#315d62" stroke="#f1d176" stroke-width="3"></path>
+          <path d="M374 33 305 8m81 24 67-25m-73 48-88 30m94-30 88 30" class="puppet-strings" fill="none" stroke="#f3dfb2" stroke-width="2"></path>
+          <path class="puppet-arm" d="m352 92-46 18-14-12" fill="none" stroke="#d3ae7c" stroke-linecap="round" stroke-width="10"></path>
+          <path class="puppet-arm" d="m408 92 46 18 14-12" fill="none" stroke="#d3ae7c" stroke-linecap="round" stroke-width="10"></path>
+          <path d="M358 143 346 164m36-21 12 21" stroke="#d3ae7c" stroke-linecap="round" stroke-width="10"></path>
+          <path d="M351 169h-20m61 0h20" stroke="#f3dfb2" stroke-linecap="round" stroke-width="6"></path>
+          <circle cx="380" cy="54" r="5" fill="#8b493b"></circle>
+          <path d="M334 153h92" stroke="#f1d176" stroke-width="3"></path>
+        </svg>
+      </div>
+      <h2 class="events-title">Key Events</h2>
+      <ul class="event-list">
+        <li class="event-item">
+          <span class="event-date">October 14, 1943</span>
+          <h2>The Puppet State</h2>
+          <p>On October 14, 1943, Japan inaugurates the Second Philippine Republic with José P. Laurel as President, enforcing strict political control through the state-sponsored KALIBAPI party.</p>
+        </li>
+        <li class="event-item">
+          <span class="event-date">1942–1945</span>
+          <h2>Mickey Mouse Money</h2>
+          <p>Japanese-issued fiat currency triggers extreme hyperinflation and severe food shortages, forcing locals to rely on black-market bartering to survive.</p>
+        </li>
+        <li class="event-item">
+          <span class="event-date">1942–1945</span>
+          <h2>Guerrilla Underground</h2>
+          <p>Refusing to recognize the regime, resistance fighters like the Hukbalahap wage relentless sabotage and espionage from the countryside.</p>
+        </li>
+        <li class="event-item">
+          <span class="event-date">August 17, 1945</span>
+          <h2>End of the Regime</h2>
+          <p>As Allied forces liberate the islands, Laurel flees to Japan and formally dissolves the puppet government on August 17, 1945, following Japan's surrender.</p>
+        </li>
+      </ul>
+      <div class="board-actions">
+        <button class="complete-phase" type="button">Mark Phase Complete</button>
+        <a class="minor-branch-link" href="Japan%20Phase2%20Branch.html">Minor Branch: The Puppet President</a>
+        <a class="return-link" href="japan.html">Return to Japan Map</a>
+        <p class="phase-status" aria-live="polite"></p>
+      </div>
+      </div>
+    </article>
+  </main>
+  <script>
+    const phaseId = "2";
+    const phaseKey = `historyrunnn.japan.phase.${phaseId}`;
+    const isUnlocked = localStorage.getItem("historyrunnn.japan.phase.1") === "finished";
+    const phaseContent = document.querySelector(".phase-content");
+    const lockedMessage = document.querySelector(".phase-locked");
+    const phaseButton = document.querySelector(".complete-phase");
+    const phaseStatus = document.querySelector(".phase-status");
+
+    if (isUnlocked) {
+      lockedMessage.hidden = true;
+      phaseContent.hidden = false;
+    }
+
+    const showCompletion = () => {
+      phaseButton.disabled = true;
+      phaseButton.textContent = "Phase Complete!";
+      phaseStatus.textContent = "Phase 2 complete — Phase 3 is now unlocked on the Japan map.";
+    };
+
+    if (isUnlocked && localStorage.getItem(phaseKey) === "finished") {
+      showCompletion();
+    }
+
+    phaseButton.addEventListener("click", () => {
+      if (!isUnlocked) {
+        return;
+      }
+
+      localStorage.setItem(phaseKey, "finished");
+      const allPhasesComplete = ["1", "2", "3"].every((id) =>
+        localStorage.getItem(`historyrunnn.japan.phase.${id}`) === "finished"
+      );
+      if (allPhasesComplete) {
+        localStorage.setItem("historyrunnn.quest.japan", "finished");
+      } else {
+        localStorage.removeItem("historyrunnn.quest.japan");
+      }
+      showCompletion();
+    });
+  </script>
+  <script src="site-audio.js" defer></script>
+</body>
+</html>
